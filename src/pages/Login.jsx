@@ -4,7 +4,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
+  const [role, setRole] = useState('student'); // Default role
+  const [prn, setPrn] = useState('');
+  const [companyId, setCompanyId] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -24,116 +26,197 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast.error('Please fill all fields!', { position: 'top-right' });
+
+    // Client-side validation
+    if (role === 'student' && (!prn || !password)) {
+      toast.error('Please fill PRN and password!', { position: 'top-right' });
+      return;
+    }
+    if (role === 'company' && (!companyId || !password)) {
+      toast.error('Please fill Company ID and password!', { position: 'top-right' });
+      return;
+    }
+    if (role === 'admin' && !password) {
+      toast.error('Please fill password!', { position: 'top-right' });
       return;
     }
 
     setIsLoading(true);
     try {
-      // Simulate login API call
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Mock delay
-      toast.success('Login successful! Redirecting...', { position: 'top-right' });
-      setTimeout(() => navigate('/dashboard'), 1500);
-    } catch {
-      toast.error('Invalid email or password!', { position: 'top-right' });
+      // Prepare payload based on role
+      const payload = role === 'student' ? { prn, password } : role === 'company' ? { companyId, password } : { password };
+
+      const response = await fetch('/logIn', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Invalid credentials');
+      }
+
+      // Store token and redirect based on role
+      const tokenKey = role === 'student' ? 'studentToken' : role === 'company' ? 'companyToken' : 'adminToken';
+      localStorage.setItem(tokenKey, data[tokenKey]);
+      toast.success(data.message || 'Login successful! Redirecting...', { position: 'top-right' });
+
+      // Redirect to role-specific dashboard
+      const redirectPath = role === 'student' ? '/dashboard' : role === 'company' ? '/company/dashboard' : '/admin/dashboard';
+      setTimeout(() => navigate(redirectPath), 1500);
+    } catch (error) {
+      toast.error(error.message || 'An error occurred. Please try again!', { position: 'top-right' });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <>
-      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-      <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <React.Fragment>
       <ToastContainer />
 
       <div className={`min-h-screen flex items-center justify-center font-poppins transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800' : 'bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500'}`}>
-        <div className={`w-full max-w-md rounded-xl p-8 shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${isDarkMode ? 'bg-gray-800 text-white border border-gray-700' : 'bg-white text-gray-800 border border-purple-100'}`}>
+        <div className={`w-full max-w-2xl rounded-xl p-6 shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_20px_5px] ${isDarkMode ? 'bg-gray-800 text-white border border-gray-700 shadow-purple-500/50' : 'bg-white text-gray-800 border border-purple-200 shadow-purple-400/50'}`}>
           {/* Header with Dark Mode Toggle */}
-          <div className="flex items-center justify-between mb-6">
-            <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-purple-300' : 'text-purple-600'}`}>
-              <i className="ri-login-circle-line mr-2 align-middle"></i> Login
+          <div className="flex items-center justify-between mb-4">
+            <h1 className={`text-2xl font-bold tracking-tight ${isDarkMode ? 'text-purple-300' : 'text-purple-600'}`}>
+              <i className="ri-login-circle-line mr-1 align-middle"></i> Login
             </h1>
-            <button onClick={toggleDarkMode} className={`p-2 rounded-full ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-purple-100 hover:bg-purple-200'}`} aria-label="Toggle dark mode">
-              {isDarkMode ? <i className="ri-sun-line text-yellow-300"></i> : <i className="ri-moon-line text-purple-600"></i>}
+            <button
+              onClick={toggleDarkMode}
+              className={`p-1.5 rounded-full transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-purple-100 hover:bg-purple-200'}`}
+              aria-label="Toggle dark mode"
+            >
+              {isDarkMode ? <i className="ri-sun-line text-yellow-300 text-lg"></i> : <i className="ri-moon-line text-purple-600 text-lg"></i>}
             </button>
           </div>
 
           {/* Login Form */}
           <form onSubmit={handleLogin}>
-            <div className="mb-4">
-              <label className={`flex items-center gap-1 mb-1 font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                <i className="ri-mail-line"></i> Email
+            {/* Role Selection */}
+            <div className="mb-3">
+              <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <i className="ri-user-settings-line"></i> Role
               </label>
               <div className="relative">
-                <span className={`absolute top-1/2 left-3 -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  <i className="ri-mail-line"></i>
+                <span className={`absolute top-1/2 left-2 -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  <i className="ri-user-settings-line"></i>
                 </span>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className={`w-full p-2 pl-9 rounded-lg transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                  required
-                />
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className={`w-full p-2 pl-8 rounded-md text-sm transition-all duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50'}`}
+                >
+                  <option value="student">Student</option>
+                  <option value="company">Company</option>
+                  <option value="admin">Admin</option>
+                </select>
               </div>
             </div>
 
-            <div className="mb-6">
-              <label className={`flex items-center gap-1 mb-1 font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                <i className="ri-lock-line"></i> Password
-              </label>
-              <div className="relative">
-                <span className={`absolute top-1/2 left-3 -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  <i className="ri-lock-line"></i>
-                </span>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className={`w-full p-2 pl-9 rounded-lg transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                  required
-                />
+            {/* Dynamic Fields */}
+            {role !== 'admin' ? (
+              <div className="grid grid-cols-2 sm:grid-cols-1 gap-4 mb-3">
+                <div>
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-id-card-line"></i> {role === 'student' ? 'PRN' : 'Company ID'}
+                  </label>
+                  <div className="relative">
+                    <span className={`absolute top-1/2 left-2 -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      <i className="ri-id-card-line"></i>
+                    </span>
+                    <input
+                      type="text"
+                      value={role === 'student' ? prn : companyId}
+                      onChange={(e) => (role === 'student' ? setPrn(e.target.value) : setCompanyId(e.target.value))}
+                      placeholder={`Enter your ${role === 'student' ? 'PRN' : 'Company ID'}`}
+                      className={`w-full p-2 pl-8 rounded-md text-sm transition-all duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50'}`}
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-lock-line"></i> Password
+                  </label>
+                  <div className="relative">
+                    <span className={`absolute top-1/2 left-2 -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      <i className="ri-lock-line"></i>
+                    </span>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      className={`w-full p-2 pl-8 rounded-md text-sm transition-all duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50'}`}
+                      required
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="mb-3">
+                <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <i className="ri-lock-line"></i> Password
+                </label>
+                <div className="relative">
+                  <span className={`absolute top-1/2 left-2 -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    <i className="ri-lock-line"></i>
+                  </span>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter admin password"
+                    className={`w-full p-2 pl-8 rounded-md text-sm transition-all duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50'}`}
+                    required
+                  />
+                </div>
+              </div>
+            )}
 
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full flex items-center justify-center p-3 rounded-lg font-medium text-white transition-colors duration-300 ${isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-600 hover:bg-purple-700'} disabled:opacity-70 disabled:cursor-not-allowed`}
+              className={`w-full flex items-center justify-center p-2 rounded-md font-medium text-white text-sm transition-all duration-300 ${isDarkMode ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700' : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700'} disabled:opacity-70 disabled:cursor-not-allowed`}
             >
               {isLoading ? (
                 <>
-                  <i className="ri-loader-4-line mr-2 animate-spin"></i> Processing...
+                  <i className="ri-loader-4-line mr-1 animate-spin"></i> Processing...
                 </>
               ) : (
                 <>
-                  <i className="ri-login-box-line mr-2"></i> Login
+                  <i className="ri-login-box-line mr-1"></i> Login
                 </>
               )}
             </button>
 
-            <div className={`flex items-center justify-between mt-4 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              
-              <a href="/forgot-password" className={`flex items-center ${isDarkMode ? 'text-purple-300 hover:text-purple-200' : 'text-purple-600 hover:text-purple-800'} hover:underline`}>
+            <div className={`flex items-center justify-end mt-3 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              <a
+                href="/forgot-password"
+                className={`flex items-center ${isDarkMode ? 'text-purple-300 hover:text-purple-200' : 'text-purple-600 hover:text-purple-800'} hover:underline transition-colors duration-200`}
+              >
                 <i className="ri-question-line mr-1"></i> Forgot password?
               </a>
             </div>
           </form>
 
           {/* Register Link */}
-          <p className={`text-center mt-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          <p className={`text-center mt-4 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
             Don't have an account?{' '}
-            <a href="/register" className={`flex items-center justify-center ${isDarkMode ? 'text-purple-300 hover:text-purple-200' : 'text-purple-600 hover:text-purple-800'} font-medium hover:underline`}>
+            <a
+              href="/register"
+              className={`flex items-center justify-center text-sm ${isDarkMode ? 'text-purple-300 hover:text-purple-200' : 'text-purple-600 hover:text-purple-800'} font-medium hover:underline transition-colors duration-200`}
+            >
               <i className="ri-user-add-line mr-1"></i> Register here
             </a>
           </p>
         </div>
       </div>
-    </>
+    </React.Fragment>
   );
 };
 
