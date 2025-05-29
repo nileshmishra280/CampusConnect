@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 
-const Navigation = ({ role }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+const Navigation = ({ role = 'student' }) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default closed on mobile
   const [sidebarWidth, setSidebarWidth] = useState(256);
   const [isResizing, setIsResizing] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
-    // Note: In production, use localStorage.getItem('darkMode') === 'true'
-    return false; // Using false as default since localStorage isn't available in artifacts
+    // Initialize darkMode from localStorage, default to false (light mode) if not set
+    return localStorage.getItem('theme') === 'dark';
   });
   const [notifications, setNotifications] = useState([
     { id: 1, message: 'New placement drive scheduled!', time: '2h ago', unread: true },
@@ -16,6 +16,8 @@ const Navigation = ({ role }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [expandedItems, setExpandedItems] = useState({});
+  const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
 
   // Define valid roles
@@ -24,25 +26,29 @@ const Navigation = ({ role }) => {
   // Validate role prop
   if (!role || !validRoles.includes(role)) {
     console.error(`Invalid role: ${role}. Role must be one of: ${validRoles.join(', ')}. Falling back to 'student' role.`);
-    role = 'student'; // Fallback to a default role
+    role = 'student';
   }
 
   // Role-based sidebar items with Remix Icons
   const defaultNavItems = {
     student: [
       { name: 'Dashboard', href: '/student/dashboard', icon: 'ri-dashboard-line', subItems: [] },
-      { name: 'Applications', href: '/student/applications', icon: 'ri-file-text-line', subItems: [
-        { name: 'Pending', href: '/student/applications/pending' },
-        { name: 'Submitted', href: '/student/applications/submitted' },
-        { name: 'History', href: '/student/applications/history' },
-      ]},
+      {
+        name: 'Applications', href: '/student/applications', icon: 'ri-file-text-line', subItems: [
+          { name: 'Pending', href: '/student/applications/pending' },
+          { name: 'Submitted', href: '/student/applications/submitted' },
+          { name: 'History', href: '/student/applications/history' },
+        ]
+      },
       { name: 'Resume Builder', href: '/student/resume', icon: 'ri-file-user-line', subItems: [] },
       { name: 'Placement Form', href: '/student/placement-form', icon: 'ri-clipboard-line', subItems: [] },
-      { name: 'Job Applications', href: '/student/apply-jobs', icon: 'ri-briefcase-line', subItems: [
-        { name: 'Browse Jobs', href: '/student/apply-jobs/browse' },
-        { name: 'Saved Jobs', href: '/student/apply-jobs/saved' },
-        { name: 'Applied Jobs', href: '/student/apply-jobs/applied' },
-      ]},
+      {
+        name: 'Job Applications', href: '/student/apply-jobs', icon: 'ri-briefcase-line', subItems: [
+          { name: 'Browse Jobs', href: '/student/apply-jobs/browse' },
+          { name: 'Saved Jobs', href: '/student/apply-jobs/saved' },
+          { name: 'Applied Jobs', href: '/student/apply-jobs/applied' },
+        ]
+      },
       { name: 'Certificates', href: '/student/certificates', icon: 'ri-award-line', subItems: [] },
       { name: 'Internship Tracker', href: '/student/internships', icon: 'ri-global-line', subItems: [] },
       { name: 'Study Materials', href: '/student/study-materials', icon: 'ri-book-open-line', subItems: [] },
@@ -50,77 +56,121 @@ const Navigation = ({ role }) => {
     ],
     admin: [
       { name: 'Dashboard', href: '/admin/dashboard', icon: 'ri-dashboard-line', subItems: [] },
-      { name: 'Users', href: '/admin/users', icon: 'ri-group-line', subItems: [
-        { name: 'Students', href: '/admin/users/students' },
-        { name: 'Coordinators', href: '/admin/users/coordinators' },
-        { name: 'Companies', href: '/admin/users/companies' },
-      ]},
-      { name: 'Analytics', href: '/admin/analytics', icon: 'ri-line-chart-line', subItems: [
-        { name: 'Placement Stats', href: '/admin/analytics/placements' },
-        { name: 'User Activity', href: '/admin/analytics/activity' },
-        { name: 'Reports', href: '/admin/analytics/reports' },
-      ]},
-      { name: 'Placements', href: '/admin/placements', icon: 'ri-building-line', subItems: [
-        { name: 'Manage Drives', href: '/admin/placements/drives' },
-        { name: 'Applications', href: '/admin/placements/applications' },
-      ]},
-      { name: 'Settings', href: '/admin/settings', icon: 'ri-settings-3-line', subItems: [
-        { name: 'System Config', href: '/admin/settings/system' },
-        { name: 'User Roles', href: '/admin/settings/roles' },
-      ]},
+      {
+        name: 'Users', href: '/admin/users', icon: 'ri-group-line', subItems: [
+          { name: 'Students', href: '/admin/users/students' },
+          { name: 'Coordinators', href: '/admin/users/coordinators' },
+          { name: 'Companies', href: '/admin/users/companies' },
+        ]
+      },
+      {
+        name: 'Analytics', href: '/admin/analytics', icon: 'ri-line-chart-line', subItems: [
+          { name: 'Placement Stats', href: '/admin/analytics/placements' },
+          { name: 'User Activity', href: '/admin/analytics/activity' },
+          { name: 'Reports', href: '/admin/analytics/reports' },
+        ]
+      },
+      {
+        name: 'Placements', href: '/admin/placements', icon: 'ri-building-line', subItems: [
+          { name: 'Manage Drives', href: '/admin/placements/drives' },
+          { name: 'Applications', href: '/admin/placements/applications' },
+        ]
+      },
+      {
+        name: 'Settings', href: '/admin/settings', icon: 'ri-settings-3-line', subItems: [
+          { name: 'System Config', href: '/admin/settings/system' },
+          { name: 'User Roles', href: '/admin/settings/roles' },
+        ]
+      },
     ],
     coordinator: [
       { name: 'Dashboard', href: '/coordinator/dashboard', icon: 'ri-dashboard-line', subItems: [] },
-      { name: 'Placements', href: '/coordinator/placements', icon: 'ri-building-line', subItems: [
-        { name: 'Upcoming Drives', href: '/coordinator/placements/upcoming' },
-        { name: 'Past Drives', href: '/coordinator/placements/past' },
-        { name: 'Applications', href: '/coordinator/placements/applications' },
-      ]},
-      { name: 'Companies', href: '/coordinator/companies', icon: 'ri-community-line', subItems: [
-        { name: 'Add Company', href: '/coordinator/companies/add' },
-        { name: 'Manage Companies', href: '/coordinator/companies/manage' },
-      ]},
-      { name: 'Schedule', href: '/coordinator/schedule', icon: 'ri-calendar-event-line', subItems: [
-        { name: 'Create Event', href: '/coordinator/schedule/create' },
-        { name: 'View Calendar', href: '/coordinator/schedule/calendar' },
-      ]},
+      {
+        name: 'Placements', href: '/coordinator/placements', icon: 'ri-building-line', subItems: [
+          { name: 'Upcoming Drives', href: '/coordinator/placements/upcoming' },
+          { name: 'Past Drives', href: '/coordinator/placements/past' },
+          { name: 'Applications', href: '/coordinator/placements/applications' },
+        ]
+      },
+      {
+        name: 'Companies', href: '/coordinator/companies', icon: 'ri-community-line', subItems: [
+          { name: 'Add Company', href: '/coordinator/companies/add' },
+          { name: 'Manage Companies', href: '/coordinator/companies/manage' },
+        ]
+      },
+      {
+        name: 'Schedule', href: '/coordinator/schedule', icon: 'ri-calendar-event-line', subItems: [
+          { name: 'Create Event', href: '/coordinator/schedule/create' },
+          { name: 'View Calendar', href: '/coordinator/schedule/calendar' },
+        ]
+      },
       { name: 'Reports', href: '/coordinator/reports', icon: 'ri-file-chart-line', subItems: [] },
     ],
     company: [
       { name: 'Dashboard', href: '/company/dashboard', icon: 'ri-dashboard-line', subItems: [] },
-      { name: 'Job Postings', href: '/company/jobs', icon: 'ri-briefcase-2-line', subItems: [
-        { name: 'Create Job', href: '/company/jobs/create' },
-        { name: 'Active Jobs', href: '/company/jobs/active' },
-        { name: 'Closed Jobs', href: '/company/jobs/closed' },
-      ]},
-      { name: 'Applications', href: '/company/applications', icon: 'ri-file-list-2-line', subItems: [
-        { name: 'Review Applications', href: '/company/applications/review' },
-        { name: 'Shortlisted', href: '/company/applications/shortlisted' },
-        { name: 'Rejected', href: '/company/applications/rejected' },
-      ]},
-      { name: 'Interviews', href: '/company/interviews', icon: 'ri-user-voice-line', subItems: [
-        { name: 'Schedule Interview', href: '/company/interviews/schedule' },
-        { name: 'Upcoming Interviews', href: '/company/interviews/upcoming' },
-        { name: 'Past Interviews', href: '/company/interviews/past' },
-      ]},
+      {
+        name: 'Job Postings', href: '/company/jobs', icon: 'ri-briefcase-2-line', subItems: [
+          { name: 'Create Job', href: '/company/jobs/create' },
+          { name: 'Active Jobs', href: '/company/jobs/active' },
+          { name: 'Closed Jobs', href: '/company/jobs/closed' },
+        ]
+      },
+      {
+        name: 'Applications', href: '/company/applications', icon: 'ri-file-list-2-line', subItems: [
+          { name: 'Review Applications', href: '/company/applications/review' },
+          { name: 'Shortlisted', href: '/company/applications/shortlisted' },
+          { name: 'Rejected', href: '/company/applications/rejected' },
+        ]
+      },
+      {
+        name: 'Interviews', href: '/company/interviews', icon: 'ri-user-voice-line', subItems: [
+          { name: 'Schedule Interview', href: '/company/interviews/schedule' },
+          { name: 'Upcoming Interviews', href: '/company/interviews/upcoming' },
+          { name: 'Past Interviews', href: '/company/interviews/past' },
+        ]
+      },
       { name: 'Analytics', href: '/company/analytics', icon: 'ri-bar-chart-line', subItems: [] },
       { name: 'Company Profile', href: '/company/profile', icon: 'ri-building-2-line', subItems: [] },
     ],
   };
 
-  const [navItems, setNavItems] = useState(() => {
-    // Note: In production, use localStorage.getItem(`navItems_${role}`)
-    return defaultNavItems[role];
-  });
+  const [navItems, setNavItems] = useState(() => defaultNavItems[role]);
 
+  // Handle screen size changes
   useEffect(() => {
-    // Note: In production, use localStorage.setItem('darkMode', darkMode)
+    const checkScreenSize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (!mobile && !isSidebarOpen) {
+        setIsSidebarOpen(true);
+      }
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Handle dark mode toggle and localStorage
+  useEffect(() => {
+    // Apply or remove 'dark' class on <html> based on darkMode state
     document.documentElement.classList.toggle('dark', darkMode);
+    // Persist theme to localStorage
+    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
   }, [darkMode]);
 
+  // Close dropdowns when clicking outside
   useEffect(() => {
-    // Note: In production, use localStorage.setItem(`navItems_${role}`, JSON.stringify(navItems))
-  }, [navItems, role]);
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.dropdown-container')) {
+        setIsProfileOpen(false);
+        setIsNotificationsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleDragStart = (e, index) => {
     e.dataTransfer.setData('text/plain', index);
@@ -143,6 +193,13 @@ const Navigation = ({ role }) => {
     }
   };
 
+  const toggleSubItems = (itemName) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [itemName]: !prev[itemName]
+    }));
+  };
+
   const filteredNavItems = navItems.filter(item =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.subItems.some(sub => sub.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -153,6 +210,8 @@ const Navigation = ({ role }) => {
     return { name: part.charAt(0).toUpperCase() + part.slice(1), href: path };
   });
 
+  const isCollapsed = !isSidebarOpen && !isMobile;
+
   return (
     <>
       {/* Remix Icons CSS */}
@@ -160,52 +219,51 @@ const Navigation = ({ role }) => {
         href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css"
         rel="stylesheet"
       />
-      
+
       <div className={`flex min-h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-gray-100'}`}>
         {/* Sidebar */}
         <aside
-          className={`fixed top-0 bottom-0 z-40 bg-gradient-to-b from-blue-600 to-blue-700 text-white transition-all duration-300 shadow-xl ${
-            isSidebarOpen ? '' : 'w-16'
-          } lg:translate-x-0 ${
-            isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-          }`}
-          style={{ width: isSidebarOpen ? `${sidebarWidth}px` : '4rem' }}
+          className={`fixed top-0 bottom-0 z-40 bg-gradient-to-b from-blue-600 to-blue-700 text-white transition-all duration-300 shadow-xl ${isMobile ? (isSidebarOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'
+            }`}
+          style={{ width: isMobile ? '280px' : (isCollapsed ? '4rem' : `${sidebarWidth}px`) }}
         >
           <div className="flex flex-col h-full">
             {/* Logo and Toggle */}
             <div className="flex items-center p-4 border-b border-blue-500/30">
-              {isSidebarOpen ? (
+              {!isCollapsed ? (
                 <Link to="/" className="flex items-center gap-3">
-                  <div className="h-8 w-8 bg-white text-blue-600 rounded-lg flex items-center justify-center">
+                  <div className="h-8 w-8 bg-white text-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
                     <i className="ri-graduation-cap-line text-lg"></i>
                   </div>
-                  <span className="text-xl font-bold">CampusConnect</span>
+                  <span className="text-xl font-bold truncate">CampusConnect</span>
                 </Link>
               ) : (
                 <div className="h-8 w-8 bg-white text-blue-600 rounded-lg flex items-center justify-center mx-auto">
                   <i className="ri-graduation-cap-line text-lg"></i>
                 </div>
               )}
-              <button
-                className="ml-auto lg:block hidden p-1 hover:bg-blue-500/30 rounded-lg transition-colors"
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                aria-label="Toggle sidebar"
-              >
-                <i className={`ri-${isSidebarOpen ? 'menu-fold' : 'menu-unfold'}-line text-xl`}></i>
-              </button>
+              {!isMobile && (
+                <button
+                  className="ml-auto p-1 hover:bg-blue-500/30 rounded-lg transition-colors"
+                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                  aria-label="Toggle sidebar"
+                >
+                  <i className={`ri-${isSidebarOpen ? 'menu-fold' : 'menu-unfold'}-line text-xl`}></i>
+                </button>
+              )}
             </div>
 
             {/* Search Bar */}
-            {isSidebarOpen && (
-              <div className="px-4 py-3">
+            {!isCollapsed && (
+              <div className="px-4 py-3 flex-shrink-0">
                 <div className="relative">
-                  <i className="ri-search-line absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-300"></i>
+                  <i className="ri-search-line absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-300 z-10"></i>
                   <input
                     type="text"
                     placeholder="Search navigation..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 rounded-lg bg-blue-500/30 text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-blue-500/50"
+                    className="w-full pl-10 pr-4 py-2 rounded-lg bg-blue-500/30 text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:bg-blue-500/50 text-sm"
                   />
                 </div>
               </div>
@@ -213,43 +271,42 @@ const Navigation = ({ role }) => {
 
             {/* Navigation Items */}
             <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-blue-600 scrollbar-thumb-blue-400 hover:scrollbar-thumb-blue-300">
-              <ul className="p-4 space-y-1">
+              <ul className="p-2 sm:p-4 space-y-1">
                 {filteredNavItems.map((item, index) => (
                   <li
                     key={item.name}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, index)}
-                    onDrop={(e) => handleDrop(e, index)}
+                    draggable={!isMobile}
+                    onDragStart={(e) => !isMobile && handleDragStart(e, index)}
+                    onDrop={(e) => !isMobile && handleDrop(e, index)}
                     onDragOver={(e) => e.preventDefault()}
                     className="group relative"
                   >
-                    <Link
-                      to={item.href}
-                      className={`flex items-center gap-3 p-3 rounded-lg hover:bg-blue-500/30 transition-all duration-200 ${
-                        location.pathname === item.href ? 'bg-blue-500/50 shadow-lg' : ''
-                      }`}
+                    <div
+                      className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg hover:bg-blue-500/30 transition-all duration-200 cursor-pointer ${location.pathname === item.href ? 'bg-blue-500/50 shadow-lg' : ''
+                        }`}
+                      onClick={() => item.subItems.length > 0 && !isCollapsed && toggleSubItems(item.name)}
                     >
-                      <i className={`${item.icon} text-xl flex-shrink-0`}></i>
-                      {isSidebarOpen && (
-                        <>
-                          <span className="flex-1 font-medium">{item.name}</span>
-                          {item.subItems.length > 0 && (
-                            <i className="ri-arrow-down-s-line text-lg transform transition-transform duration-300 group-hover:rotate-180"></i>
-                          )}
-                        </>
+                      <Link to={item.href} className="flex items-center gap-3 flex-1 min-w-0">
+                        <i className={`${item.icon} text-lg sm:text-xl flex-shrink-0`}></i>
+                        {!isCollapsed && (
+                          <span className="flex-1 font-medium text-sm sm:text-base truncate">{item.name}</span>
+                        )}
+                      </Link>
+                      {!isCollapsed && item.subItems.length > 0 && (
+                        <i className={`ri-arrow-down-s-line text-lg transform transition-transform duration-300 ${expandedItems[item.name] ? 'rotate-180' : ''
+                          }`}></i>
                       )}
-                    </Link>
-                    
+                    </div>
+
                     {/* Sub Items */}
-                    {isSidebarOpen && item.subItems.length > 0 && (
-                      <ul className="ml-8 mt-1 space-y-1 hidden group-hover:block animate-fadeIn">
+                    {!isCollapsed && item.subItems.length > 0 && expandedItems[item.name] && (
+                      <ul className="ml-6 sm:ml-8 mt-1 space-y-1 animate-fadeIn">
                         {item.subItems.map((subItem) => (
                           <li key={subItem.name}>
                             <Link
                               to={subItem.href}
-                              className={`block p-2 rounded-lg hover:bg-blue-400/30 transition-colors text-sm ${
-                                location.pathname === subItem.href ? 'bg-blue-400/50 text-white' : 'text-blue-100'
-                              }`}
+                              className={`block p-2 rounded-lg hover:bg-blue-400/30 transition-colors text-xs sm:text-sm ${location.pathname === subItem.href ? 'bg-blue-400/50 text-white' : 'text-blue-100'
+                                }`}
                             >
                               {subItem.name}
                             </Link>
@@ -257,9 +314,9 @@ const Navigation = ({ role }) => {
                         ))}
                       </ul>
                     )}
-                    
+
                     {/* Tooltip for collapsed sidebar */}
-                    {!isSidebarOpen && (
+                    {isCollapsed && (
                       <div className="absolute left-16 top-1/2 transform -translate-y-1/2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap">
                         {item.name}
                         <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
@@ -271,9 +328,9 @@ const Navigation = ({ role }) => {
             </nav>
 
             {/* Quick Access Toolbar */}
-            {isSidebarOpen && (
-              <div className="p-4 border-t border-blue-500/30">
-                <h3 className="text-sm font-semibold mb-3 text-blue-100">Quick Access</h3>
+            {!isCollapsed && (
+              <div className="p-2 sm:p-4 border-t border-blue-500/30 flex-shrink-0">
+                <h3 className="text-xs sm:text-sm font-semibold mb-3 text-blue-100">Quick Access</h3>
                 <div className="flex gap-2">
                   <button className="flex-1 p-2 bg-blue-500/30 rounded-lg hover:bg-blue-400/40 transition-colors" title="Add New">
                     <i className="ri-add-line text-lg"></i>
@@ -289,8 +346,8 @@ const Navigation = ({ role }) => {
             )}
           </div>
 
-          {/* Resize Handle */}
-          {isSidebarOpen && (
+          {/* Resize Handle - Desktop only */}
+          {!isMobile && isSidebarOpen && (
             <div
               className="absolute top-0 right-0 w-1 h-full bg-blue-400/50 cursor-col-resize hover:bg-blue-300 transition-colors"
               onMouseDown={() => setIsResizing(true)}
@@ -300,9 +357,7 @@ const Navigation = ({ role }) => {
 
         {/* Mobile Toggle */}
         <button
-          className={`fixed top-4 left-4 z-50 lg:hidden h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-lg hover:bg-blue-700 transition-all duration-300 ${
-            isSidebarOpen ? 'rotate-180' : ''
-          }`}
+          className={`fixed top-4 ${isSidebarOpen ? 'left-72' : 'left-4'} z-50 lg:hidden h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-lg hover:bg-blue-700 transition-all duration-300`}
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           aria-expanded={isSidebarOpen}
           aria-label="Toggle sidebar"
@@ -312,64 +367,86 @@ const Navigation = ({ role }) => {
 
         {/* Main Content */}
         <div
-          className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
-            isSidebarOpen ? 'lg:ml-64' : 'lg:ml-16'
-          }`}
+          className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isMobile ? '' : (isCollapsed ? 'ml-16' : `ml-[${sidebarWidth}px]`)
+            }`}
           onMouseMove={handleResize}
           onMouseUp={() => setIsResizing(false)}
-          style={{ marginLeft: isSidebarOpen ? `${sidebarWidth}px` : '4rem' }}
+          style={{
+            marginLeft: isMobile ? 0 : (isCollapsed ? '4rem' : `${sidebarWidth}px`)
+          }}
         >
           {/* Top Bar */}
-          <header className="sticky top-0 z-30 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-sm border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between px-6 py-4">
-              <div className="flex items-center gap-4">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+          <header className="sticky top-0 z-30 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-lg border-b border-gray-200/50 dark:border-gray-700/50">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 max-w-7xl mx-auto">
+              <div className="flex items-center gap-4 min-w-0 flex-1">
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-lg sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 truncate">
                     {role.charAt(0).toUpperCase() + role.slice(1)} Dashboard
                   </h1>
                   {/* Breadcrumbs */}
-                  <div className="hidden md:flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mt-1.5">
                     {breadcrumbs.map((crumb, index) => (
                       <div key={crumb.href} className="flex items-center">
-                        <Link to={crumb.href} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        <Link
+                          to={crumb.href}
+                          className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 truncate font-medium"
+                        >
                           {crumb.name}
                         </Link>
                         {index < breadcrumbs.length - 1 && (
-                          <i className="ri-arrow-right-s-line mx-1"></i>
+                          <i className="ri-arrow-right-s-line mx-1.5 text-gray-400 dark:text-gray-500 flex-shrink-0"></i>
                         )}
                       </div>
                     ))}
                   </div>
                 </div>
+                {/* Compact Search Bar */}
+                <div className="relative hidden md:block">
+                  <i className="ri-search-line absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
+                  <input
+                    type="text"
+                    placeholder="Quick search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-40 lg:w-56 pl-9 pr-4 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-all duration-200"
+                  />
+                </div>
               </div>
-              
-              <div className="flex items-center gap-3">
+
+              <div className="flex items-center gap-1 sm:gap-2 lg:gap-3">
                 {/* Notifications */}
-                <div className="relative">
+                <div className="relative dropdown-container">
                   <button
                     onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                    className="relative p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    className="relative p-2 sm:p-2.5 lg:p-3 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                     aria-label="Notifications"
+                    aria-expanded={isNotificationsOpen}
                   >
-                    <i className="ri-notification-3-line text-xl text-gray-600 dark:text-gray-300"></i>
-                    {notifications.filter(n => n.unread).length > 0 && (
-                      <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
-                        {notifications.filter(n => n.unread).length}
+                    <i className="ri-notification-3-line text-lg sm:text-xl text-gray-600 dark:text-gray-300"></i>
+                    {notifications.filter((n) => n.unread).length > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 h-4 w-4 sm:h-5 sm:w-5 bg-gradient-to-br from-red-500 to-pink-500 text-white text-xs rounded-full flex items-center justify-center font-medium shadow-sm animate-pulse">
+                        {notifications.filter((n) => n.unread).length}
                       </span>
                     )}
                   </button>
                   {isNotificationsOpen && (
-                    <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                      <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+                    <div className="absolute right-0 mt-3 w-72 sm:w-80 bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden animate-slideDown">
+                      <div className="p-3 sm:p-4 border-b border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600">
                         <div className="flex items-center justify-between">
-                          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Notifications</h3>
-                          <i className="ri-settings-3-line text-gray-500 hover:text-gray-700 cursor-pointer"></i>
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200">Notifications</h3>
+                          <button className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200">
+                            <i className="ri-settings-3-line"></i>
+                          </button>
                         </div>
                       </div>
-                      <div className="max-h-80 overflow-y-auto">
+                      <div className="max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
                         {notifications.map((notification) => (
-                          <div key={notification.id} className={`p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${notification.unread ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}>
-                            <p className="text-sm text-gray-800 dark:text-gray-200 mb-1">{notification.message}</p>
+                          <div
+                            key={notification.id}
+                            className={`p-3 sm:p-4 border-b border-gray-100/50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200 ${notification.unread ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''
+                              }`}
+                          >
+                            <p className="text-sm text-gray-800 dark:text-gray-200 mb-1 font-medium">{notification.message}</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">{notification.time}</p>
                           </div>
                         ))}
@@ -377,48 +454,58 @@ const Navigation = ({ role }) => {
                     </div>
                   )}
                 </div>
-                
+
                 {/* Dark Mode Toggle */}
                 <button
                   onClick={() => setDarkMode(!darkMode)}
-                  className="p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="p-2 sm:p-2.5 lg:p-3 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                   aria-label="Toggle dark mode"
                 >
-                  <i className={`ri-${darkMode ? 'sun' : 'moon'}-line text-xl text-gray-600 dark:text-gray-300`}></i>
+                  <i
+                    className={`ri-${darkMode ? 'sun' : 'moon'}-line text-lg sm:text-xl text-gray-600 dark:text-gray-300 transition-transform duration-300 ${darkMode ? 'rotate-180' : 'rotate-0'
+                      }`}
+                  ></i>
                 </button>
-                
+
                 {/* Profile Dropdown */}
-                <div className="relative">
+                <div className="relative dropdown-container">
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    className="flex items-center gap-2 p-1 sm:p-2 rounded-xl hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                     aria-label="Profile menu"
+                    aria-expanded={isProfileOpen}
                   >
-                    <div className="text-right hidden sm:block">
-                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200 block">Mishra Nilesh</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">{role}</span>
+                    <div className="text-right hidden md:block">
+                      <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 block">Mishra Nilesh</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">{role}</span>
                     </div>
                     <img
                       src="https://i.pravatar.cc/40?img=35"
                       alt="User avatar"
-                      className="h-10 w-10 rounded-full border-2 border-white shadow-sm"
+                      className="h-8 w-8 sm:h-9 sm:w-9 rounded-full border-2 border-white dark:border-gray-700 shadow-md hover:scale-105 transition-transform duration-200"
                     />
-                    <i className="ri-arrow-down-s-line text-gray-500"></i>
+                    <i className="ri-arrow-down-s-line text-gray-500 hidden sm:block transition-transform duration-200"></i>
                   </button>
                   {isProfileOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                      <Link to="/profile" className="flex items-center gap-3 px-4 py-3 text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                        <i className="ri-user-line"></i>
-                        Profile
+                    <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden animate-slideDown">
+                      <Link
+                        to="student/profile"
+                        className="flex items-center gap-3 px-4 py-3 text-gray-800 dark:text-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-colors duration-200"
+                      >
+                        <i className="ri-user-line text-lg"></i>
+                        <span className="font-medium">Profile</span>
                       </Link>
-                      <Link to="/settings" className="flex items-center gap-3 px-4 py-3 text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                        <i className="ri-settings-3-line"></i>
-                        Settings
+                      <Link
+                        to="student/upload-marksheet"
+                        className="flex items-center gap-3 px-4 py-3 text-gray-800 dark:text-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-colors duration-200"
+                      >
+                        <i className="ri-settings-3-line text-lg"></i>
+                        <span className="font-medium">Upload Marksheets</span>
                       </Link>
-                      <hr className="border-gray-200 dark:border-gray-700" />
-                      <button className="flex items-center gap-3 w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                        <i className="ri-logout-box-line"></i>
-                        Logout
+                      <hr className="border-gray-200/50 dark:border-gray-700/50" />
+                      <button className="flex items-center gap-3 w-full text-left px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/20 transition-colors duration-200">
+                        <i className="ri-logout-box-line text-lg"></i>
+                        <span className="font-medium">Logout</span>
                       </button>
                     </div>
                   )}
@@ -428,7 +515,7 @@ const Navigation = ({ role }) => {
           </header>
 
           {/* Main Content Area */}
-          <main className="flex-1 p-6 overflow-auto">
+          <main className="flex-1 overflow-auto">
             <div className="max-w-7xl mx-auto">
               <Outlet />
             </div>
@@ -436,12 +523,13 @@ const Navigation = ({ role }) => {
         </div>
 
         {/* Mobile Backdrop */}
-        <div
-          className={`fixed inset-0 bg-black/50 z-30 lg:hidden transition-opacity duration-300 ${
-            isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
-          onClick={() => setIsSidebarOpen(false)}
-        />
+        {isMobile && (
+          <div
+            className={`fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
       </div>
 
       <style jsx>{`
@@ -471,6 +559,16 @@ const Navigation = ({ role }) => {
         }
         .scrollbar-thin::-webkit-scrollbar-thumb:hover {
           background: rgba(59, 130, 246, 0.7);
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 640px) {
+          .dropdown-container > div {
+            left: auto !important;
+            right: 0 !important;
+            width: calc(100vw - 2rem) !important;
+            max-width: 320px !important;
+          }
         }
       `}</style>
     </>
