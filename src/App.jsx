@@ -9,6 +9,7 @@ import StudentDashboard from './pages/student/StudentDashboard';
 import StudentProfile from './pages/student/StudentProfile';
 import CompanyDashboard from './pages/company/CompanyDashboard';
 import UploadMarksheet from './pages/student/UploadMarksheet';
+import JobInfo from './pages/JobInfo';
 const App = () => {
  // localStorage.clear(); // Clear localStorage for testing purposes
   return (
@@ -25,7 +26,7 @@ const App = () => {
         <Route path="/admin/dashboard" element={<AdminDashboard/>} />
         <Route path="/student/profile" element={<StudentProfile />} />
         <Route path="/student/upload-marksheet" element={<UploadMarksheet />} />
-        
+        <Route path="/jobInfo" element={<JobInfo />} />
         </Route>
 
  
