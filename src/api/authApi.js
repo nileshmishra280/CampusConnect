@@ -71,3 +71,35 @@ export const sendMarksheets = async (marksheetData) => {
     throw error.response ? error.response.data : error;
   }
 };
+
+
+// Fetch student data
+export const fetchStudentData = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/student/studentData`, {
+      headers: {
+        Authorization: `${localStorage.getItem('studentToken')}`,
+      },
+    });
+    console.log('Student data fetched:', response);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching student data:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+// Fetch company data
+export const fetchCompanyData = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/company/companyData`, {
+      headers: {
+        Authorization: `${localStorage.getItem('companyToken')}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching company data:', error);
+    throw error.response ? error.response.data : error;
+  }
+};

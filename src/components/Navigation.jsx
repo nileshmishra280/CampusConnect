@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-const Navigation = ({ role = 'student' }) => {
+
+const Navigation = ({ role }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default closed on mobile
   const [sidebarWidth, setSidebarWidth] = useState(256);
   const [isResizing, setIsResizing] = useState(false);
@@ -21,7 +23,7 @@ const Navigation = ({ role = 'student' }) => {
   const location = useLocation();
 
   // Define valid roles
-  const validRoles = ['student', 'admin', 'coordinator', 'company'];
+  const validRoles = ['student', 'admin', 'company'];
 
   // Validate role prop
   if (!role || !validRoles.includes(role)) {
@@ -59,7 +61,6 @@ const Navigation = ({ role = 'student' }) => {
       {
         name: 'Users', href: '/admin/users', icon: 'ri-group-line', subItems: [
           { name: 'Students', href: '/admin/users/students' },
-          { name: 'Coordinators', href: '/admin/users/coordinators' },
           { name: 'Companies', href: '/admin/users/companies' },
         ]
       },
@@ -82,29 +83,6 @@ const Navigation = ({ role = 'student' }) => {
           { name: 'User Roles', href: '/admin/settings/roles' },
         ]
       },
-    ],
-    coordinator: [
-      { name: 'Dashboard', href: '/coordinator/dashboard', icon: 'ri-dashboard-line', subItems: [] },
-      {
-        name: 'Placements', href: '/coordinator/placements', icon: 'ri-building-line', subItems: [
-          { name: 'Upcoming Drives', href: '/coordinator/placements/upcoming' },
-          { name: 'Past Drives', href: '/coordinator/placements/past' },
-          { name: 'Applications', href: '/coordinator/placements/applications' },
-        ]
-      },
-      {
-        name: 'Companies', href: '/coordinator/companies', icon: 'ri-community-line', subItems: [
-          { name: 'Add Company', href: '/coordinator/companies/add' },
-          { name: 'Manage Companies', href: '/coordinator/companies/manage' },
-        ]
-      },
-      {
-        name: 'Schedule', href: '/coordinator/schedule', icon: 'ri-calendar-event-line', subItems: [
-          { name: 'Create Event', href: '/coordinator/schedule/create' },
-          { name: 'View Calendar', href: '/coordinator/schedule/calendar' },
-        ]
-      },
-      { name: 'Reports', href: '/coordinator/reports', icon: 'ri-file-chart-line', subItems: [] },
     ],
     company: [
       { name: 'Dashboard', href: '/company/dashboard', icon: 'ri-dashboard-line', subItems: [] },

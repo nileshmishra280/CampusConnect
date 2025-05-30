@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
+import {StudentLogin,CompanyLogin,AdminLogin} from '../api/authApi'; // Adjust the import path as necessary
 import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage = () => {
@@ -26,47 +27,28 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    // Client-side validation
-    if (role === 'student' && (!prn || !password)) {
-      toast.error('Please fill PRN and password!', { position: 'top-right' });
-      return;
-    }
-    if (role === 'company' && (!companyId || !password)) {
-      toast.error('Please fill Company ID and password!', { position: 'top-right' });
-      return;
-    }
-    if (role === 'admin' && !password) {
-      toast.error('Please fill password!', { position: 'top-right' });
-      return;
-    }
-
     setIsLoading(true);
     try {
-      // Prepare payload based on role
-      const payload = role === 'student' ? { prn, password } : role === 'company' ? { companyId, password } : { password };
+        console.log('Logging in with role:', role);
+       const response = role === 'student' ? await StudentLogin(prn, password) : role === 'company' ? await CompanyLogin(companyId, password) : await AdminLogin(password);
 
-      const response = await fetch('https://tnpbackend-p2xb.onrender.com/student/logIn', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+      console.log('Login response:', response);
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || 'Invalid credentials');
+      const data = role=== 'student' ? response.studentToken : role === 'company' ? response.companyToken : response.adminToken;
+      if (!data) {
+        throw new Error('Login failed. Please check your credentials.');
       }
 
-      // Store token and redirect based on role
-      const tokenKey = role === 'student' ? 'studentToken' : role === 'company' ? 'companyToken' : 'adminToken';
-      localStorage.setItem(tokenKey, data[tokenKey]);
+    
+      const tokenKey = data;
+
+      localStorage.setItem(`${role}Token`, tokenKey);
+      localStorage.setItem('role', role);
       toast.success(data.message || 'Login successful! Redirecting...', { position: 'top-right' });
 
       // Redirect to role-specific dashboard
       const redirectPath = role === 'student' ? '/student/dashboard' : role === 'company' ? '/company/dashboard' : '/admin/dashboard';
-      setTimeout(() => navigate(redirectPath), 1500);
+     navigate(redirectPath);
     } catch (error) {
       toast.error(error.message || 'An error occurred. Please try again!', { position: 'top-right' });
     } finally {
