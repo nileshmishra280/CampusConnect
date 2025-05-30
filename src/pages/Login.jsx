@@ -46,7 +46,7 @@ const LoginPage = () => {
       // Prepare payload based on role
       const payload = role === 'student' ? { prn, password } : role === 'company' ? { companyId, password } : { password };
 
-      const response = await fetch('/logIn', {
+      const response = await fetch('https://tnpbackend-p2xb.onrender.com/student/logIn', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ const LoginPage = () => {
       toast.success(data.message || 'Login successful! Redirecting...', { position: 'top-right' });
 
       // Redirect to role-specific dashboard
-      const redirectPath = role === 'student' ? '/dashboard' : role === 'company' ? '/company/dashboard' : '/admin/dashboard';
+      const redirectPath = role === 'student' ? '/student/dashboard' : role === 'company' ? '/company/dashboard' : '/admin/dashboard';
       setTimeout(() => navigate(redirectPath), 1500);
     } catch (error) {
       toast.error(error.message || 'An error occurred. Please try again!', { position: 'top-right' });
