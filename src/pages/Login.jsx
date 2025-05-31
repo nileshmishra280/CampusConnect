@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-import {StudentLogin,CompanyLogin,AdminLogin} from '../api/authApi'; // Adjust the import path as necessary
+import { StudentLogin, CompanyLogin, AdminLogin, fetchStudentData, fetchCompanyData } from '../api/authApi'; // Import missing API functions
+import { useAuth } from '../context/AuthContext';
 import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage = () => {
@@ -10,47 +11,75 @@ const LoginPage = () => {
   const [companyId, setCompanyId] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Check localStorage first, then fall back to system preference
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme ? savedTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
   const navigate = useNavigate();
+  const { setUser, setUserType } = useAuth();
 
-  // Check system preference for dark mode on mount
+  // Apply dark mode and persist preference
   useEffect(() => {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    setIsDarkMode(prefersDark);
-    document.documentElement.classList.toggle('dark', prefersDark);
-  }, []);
+    document.documentElement.classList.toggle('dark', isDarkMode);
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
 
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
+    setIsDarkMode((prev) => !prev);
   };
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e, role, prn, companyId, password) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-        console.log('Logging in with role:', role);
-       const response = role === 'student' ? await StudentLogin(prn, password) : role === 'company' ? await CompanyLogin(companyId, password) : await AdminLogin(password);
+      console.log('Logging in with role:', role);
+      const response = role === 'student' ? await StudentLogin(prn, password) : role === 'company' ? await CompanyLogin(companyId, password) : await AdminLogin(password);
 
       console.log('Login response:', response);
 
-      const data = role=== 'student' ? response.studentToken : role === 'company' ? response.companyToken : response.adminToken;
+      const data = role === 'student' ? response.studentToken : role === 'company' ? response.companyToken : response.adminToken;
       if (!data) {
         throw new Error('Login failed. Please check your credentials.');
       }
 
-    
       const tokenKey = data;
 
+      // Clear localStorage before setting new items
+      localStorage.clear();
+
+      // Set new values in localStorage
       localStorage.setItem(`${role}Token`, tokenKey);
       localStorage.setItem('role', role);
+
+      // Fetch the full user data based on role
+      let userData = null;
+      if (role === 'student') {
+        userData = await fetchStudentData();
+      } else if (role === 'company') {
+        userData = await fetchCompanyData();
+      } else if (role === 'admin') {
+        userData = { role: 'admin' }; // Placeholder; replace with fetchAdminData if available
+      } else {
+        throw new Error('Invalid role detected.');
+      }
+
+      // Update AuthContext state with the full user data
+      setUserType(role);
+      setUser(userData);
+
       toast.success(data.message || 'Login successful! Redirecting...', { position: 'top-right' });
 
       // Redirect to role-specific dashboard
       const redirectPath = role === 'student' ? '/student/dashboard' : role === 'company' ? '/company/dashboard' : '/admin/dashboard';
-     navigate(redirectPath);
+
+      setTimeout(() => {
+        navigate(redirectPath);
+      }, 1000); // Redirect after a short delay to allow toast to display
     } catch (error) {
-      toast.error(error.message || 'An error occurred. Please try again!', { position: 'top-right' });
+      console.error('Login error:', error);
+      const errorMessage = error.message || error.code === 'ERR_NETWORK' ? 'Network error. Please check your connection and try again.' : 'An error occurred during login. Please try again!';
+      toast.error(errorMessage, { position: 'top-right' });
     } finally {
       setIsLoading(false);
     }
@@ -77,10 +106,10 @@ const LoginPage = () => {
           </div>
 
           {/* Login Form */}
-          <form onSubmit={handleLogin}>
+          <form onSubmit={(e) => handleLogin(e, role, prn, companyId, password)}>
             {/* Role Selection */}
             <div className="mb-3">
-              <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label htmlFor="role" className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 <i className="ri-user-settings-line"></i> Role
               </label>
               <div className="relative">
@@ -88,9 +117,11 @@ const LoginPage = () => {
                   <i className="ri-user-settings-line"></i>
                 </span>
                 <select
+                  id="role"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                   className={`w-full p-2 pl-8 rounded-md text-sm transition-all duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50'}`}
+                  aria-label="Select your role"
                 >
                   <option value="student">Student</option>
                   <option value="company">Company</option>
@@ -103,7 +134,7 @@ const LoginPage = () => {
             {role !== 'admin' ? (
               <div className="grid grid-cols-2 sm:grid-cols-1 gap-4 mb-3">
                 <div>
-                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <label htmlFor={role === 'student' ? 'prn' : 'companyId'} className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     <i className="ri-id-card-line"></i> {role === 'student' ? 'PRN' : 'Company ID'}
                   </label>
                   <div className="relative">
@@ -111,17 +142,19 @@ const LoginPage = () => {
                       <i className="ri-id-card-line"></i>
                     </span>
                     <input
+                      id={role === 'student' ? 'prn' : 'companyId'}
                       type="text"
                       value={role === 'student' ? prn : companyId}
                       onChange={(e) => (role === 'student' ? setPrn(e.target.value) : setCompanyId(e.target.value))}
                       placeholder={`Enter your ${role === 'student' ? 'PRN' : 'Company ID'}`}
                       className={`w-full p-2 pl-8 rounded-md text-sm transition-all duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50'}`}
                       required
+                      aria-label={role === 'student' ? 'Enter your PRN' : 'Enter your Company ID'}
                     />
                   </div>
                 </div>
                 <div>
-                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <label htmlFor="password" className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     <i className="ri-lock-line"></i> Password
                   </label>
                   <div className="relative">
@@ -129,19 +162,21 @@ const LoginPage = () => {
                       <i className="ri-lock-line"></i>
                     </span>
                     <input
+                      id="password"
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
                       className={`w-full p-2 pl-8 rounded-md text-sm transition-all duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50'}`}
                       required
+                      aria-label="Enter your password"
                     />
                   </div>
                 </div>
               </div>
             ) : (
               <div className="mb-3">
-                <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label htmlFor="password" className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   <i className="ri-lock-line"></i> Password
                 </label>
                 <div className="relative">
@@ -149,12 +184,14 @@ const LoginPage = () => {
                     <i className="ri-lock-line"></i>
                   </span>
                   <input
+                    id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter admin password"
                     className={`w-full p-2 pl-8 rounded-md text-sm transition-all duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50'}`}
                     required
+                    aria-label="Enter admin password"
                   />
                 </div>
               </div>

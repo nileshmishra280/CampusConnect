@@ -9,51 +9,79 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  // Function to load user data based on role and token
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        const role = localStorage.getItem('role');
-        setUserType(role);
-        console.log('User role from localStorage:', role);
+      const role = localStorage.getItem('role');
+      setUserType(role);
+      console.log('User role from localStorage:', role);
 
-        let token;
-        if (role === 'student') {
-          token = localStorage.getItem('studentToken');
-        } else if (role === 'company') {
-          token = localStorage.getItem('companyToken');
-        } else if (role === 'admin') {
-          token = localStorage.getItem('adminToken');
-        }
+      let token;
+      if (role === 'student') {
+        token = localStorage.getItem('studentToken');
+      } else if (role === 'company') {
+        token = localStorage.getItem('companyToken');
+      } else if (role === 'admin') {
+        token = localStorage.getItem('adminToken');
+      }
 
-        if (!token) {
-          console.warn('No token found for role:', role);
-          setLoading(false);
-          return;
-        }
-
-        let userData = null;
-        if (role === 'student') {
-          userData = await fetchStudentData();
-        } else if (role === 'company') {
-          userData = await fetchCompanyData();
-        }
-
-        setUser(userData);
-      } catch (err) {
-        console.error('Error loading user:', err);
-        setError(err.error || 'Failed to load user data');
+      if (!token) {
+        console.warn('No token found for role:', role);
         setUser(null);
         setUserType(null);
-      } finally {
         setLoading(false);
+        return;
+      }
+
+      let userData = null;
+      if (role === 'student') {
+        userData = await fetchStudentData();
+      } else if (role === 'company') {
+        userData = await fetchCompanyData();
+      } else if (role === 'admin') {
+        // Admin data fetch can be added if needed
+        userData = { role: 'admin' }; // Placeholder for admin data
+      }
+
+      setUser(userData);
+    } catch (err) {
+      console.error('Error loading user:', err);
+      setError(err.error || 'Failed to load user data');
+      setUser(null);
+      setUserType(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load data on initial render
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // Listen for changes to the role in localStorage
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const newRole = localStorage.getItem('role');
+      if (newRole !== userType) {
+        console.log('Role changed in localStorage, reloading user:', newRole);
+        loadData(); // Reload user data when role changes
       }
     };
 
-    loadData();
-  }, []);
+    // Listen for storage events (triggered by other tabs)
+    window.addEventListener('storage', handleStorageChange);
+
+    // Also check manually for changes in the same tab
+    handleStorageChange();
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [userType]); // Re-run when userType changes
 
   const logout = () => {
     localStorage.clear();

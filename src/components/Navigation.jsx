@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 
 const Navigation = ({ role }) => {
+  const { user } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default closed on mobile
   const [sidebarWidth, setSidebarWidth] = useState(256);
   const [isResizing, setIsResizing] = useState(false);
@@ -335,12 +336,12 @@ const Navigation = ({ role }) => {
 
         {/* Mobile Toggle */}
         <button
-          className={`fixed top-4 ${isSidebarOpen ? 'left-72' : 'left-4'} z-50 lg:hidden h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-lg hover:bg-blue-700 transition-all duration-300`}
+          className={`fixed top-4 ${isSidebarOpen ? 'left-72' : 'left-0'} z-50 lg:hidden h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-lg hover:bg-blue-700 transition-all duration-300`}
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           aria-expanded={isSidebarOpen}
           aria-label="Toggle sidebar"
         >
-          <i className={`ri-${isSidebarOpen ? 'close' : 'menu'}-line text-xl`}></i>
+          <i className={`ri-${isSidebarOpen ? 'close' : 'menu'}-line text-1px`}></i>
         </button>
 
         {/* Main Content */}
@@ -354,143 +355,148 @@ const Navigation = ({ role }) => {
           }}
         >
           {/* Top Bar */}
-          <header className="sticky top-0 z-30 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-lg border-b border-gray-200/50 dark:border-gray-700/50">
-            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 max-w-7xl mx-auto">
-              <div className="flex items-center gap-4 min-w-0 flex-1">
-                <div className="min-w-0 flex-1">
-                  <h1 className="text-lg sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 truncate">
-                    {role.charAt(0).toUpperCase() + role.slice(1)} Dashboard
-                  </h1>
-                  {/* Breadcrumbs */}
-                  <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mt-1.5">
-                    {breadcrumbs.map((crumb, index) => (
-                      <div key={crumb.href} className="flex items-center">
-                        <Link
-                          to={crumb.href}
-                          className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 truncate font-medium"
-                        >
-                          {crumb.name}
-                        </Link>
-                        {index < breadcrumbs.length - 1 && (
-                          <i className="ri-arrow-right-s-line mx-1.5 text-gray-400 dark:text-gray-500 flex-shrink-0"></i>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                {/* Compact Search Bar */}
-                <div className="relative hidden md:block">
-                  <i className="ri-search-line absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
-                  <input
-                    type="text"
-                    placeholder="Quick search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-40 lg:w-56 pl-9 pr-4 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-all duration-200"
-                  />
-                </div>
-              </div>
+        <header className="sticky top-0 z-30 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-lg border-b border-gray-200/50 dark:border-gray-700/50">
+  <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 max-w-7xl mx-auto">
+    <div className="flex items-center gap-4 min-w-0 flex-1">
+      <div className="min-w-0 flex-1">
+        <h1 className="text-lg sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 truncate pl-4">
+          {role.charAt(0).toUpperCase() + role.slice(1)} Dashboard
+        </h1>
+        {/* To center instead, replace pl-4 with text-center */}
+        {/* <h1 className="text-lg sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 truncate text-center"> */}
+        <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mt-1.5">
+          {breadcrumbs.map((crumb, index) => (
+            <div key={crumb.href} className="flex items-center">
+              <Link
+                to={crumb.href}
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 truncate font-medium"
+              >
+                {crumb.name}
+              </Link>
+              {index < breadcrumbs.length - 1 && (
+                <i className="ri-arrow-right-s-line mx-1.5 text-gray-400 dark:text-gray-500 flex-shrink-0"></i>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="relative hidden md:block">
+        <i className="ri-search-line absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
+        <input
+          type="text"
+          placeholder="Quick search..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-40 lg:w-56 pl-9 pr-4 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-all duration-200"
+        />
+      </div>
+    </div>
 
-              <div className="flex items-center gap-1 sm:gap-2 lg:gap-3">
-                {/* Notifications */}
-                <div className="relative dropdown-container">
-                  <button
-                    onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                    className="relative p-2 sm:p-2.5 lg:p-3 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                    aria-label="Notifications"
-                    aria-expanded={isNotificationsOpen}
-                  >
-                    <i className="ri-notification-3-line text-lg sm:text-xl text-gray-600 dark:text-gray-300"></i>
-                    {notifications.filter((n) => n.unread).length > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 h-4 w-4 sm:h-5 sm:w-5 bg-gradient-to-br from-red-500 to-pink-500 text-white text-xs rounded-full flex items-center justify-center font-medium shadow-sm animate-pulse">
-                        {notifications.filter((n) => n.unread).length}
-                      </span>
-                    )}
-                  </button>
-                  {isNotificationsOpen && (
-                    <div className="absolute right-0 mt-3 w-72 sm:w-80 bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden animate-slideDown">
-                      <div className="p-3 sm:p-4 border-b border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200">Notifications</h3>
-                          <button className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200">
-                            <i className="ri-settings-3-line"></i>
-                          </button>
-                        </div>
-                      </div>
-                      <div className="max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
-                        {notifications.map((notification) => (
-                          <div
-                            key={notification.id}
-                            className={`p-3 sm:p-4 border-b border-gray-100/50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200 ${notification.unread ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''
-                              }`}
-                          >
-                            <p className="text-sm text-gray-800 dark:text-gray-200 mb-1 font-medium">{notification.message}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{notification.time}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Dark Mode Toggle */}
-                <button
-                  onClick={() => setDarkMode(!darkMode)}
-                  className="p-2 sm:p-2.5 lg:p-3 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                  aria-label="Toggle dark mode"
-                >
-                  <i
-                    className={`ri-${darkMode ? 'sun' : 'moon'}-line text-lg sm:text-xl text-gray-600 dark:text-gray-300 transition-transform duration-300 ${darkMode ? 'rotate-180' : 'rotate-0'
-                      }`}
-                  ></i>
+    <div className="flex items-center gap-1 sm:gap-2 lg:gap-3">
+      <div className="relative dropdown-container">
+        <button
+          onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+          className="relative p-2 sm:p-2.5 lg:p-3 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+          aria-label="Notifications"
+          aria-expanded={isNotificationsOpen}
+        >
+          <i className="ri-notification-3-line text-lg sm:text-xl text-gray-600 dark:text-gray-300"></i>
+          {notifications.filter((n) => n.unread).length > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 h-4 w-4 sm:h-5 sm:w-5 bg-gradient-to-br from-red-500 to-pink-500 text-white text-xs rounded-full flex items-center justify-center font-medium shadow-sm animate-pulse">
+              {notifications.filter((n) => n.unread).length}
+            </span>
+          )}
+        </button>
+        {isNotificationsOpen && (
+          <div className="absolute right-0 mt-3 w-72 sm:w-80 bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden animate-slideDown">
+            <div className="p-3 sm:p-4 border-b border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200">Notifications</h3>
+                <button className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200">
+                  <i className="ri-settings-3-line"></i>
                 </button>
-
-                {/* Profile Dropdown */}
-                <div className="relative dropdown-container">
-                  <button
-                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-2 p-1 sm:p-2 rounded-xl hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                    aria-label="Profile menu"
-                    aria-expanded={isProfileOpen}
-                  >
-                    <div className="text-right hidden md:block">
-                      <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 block">Mishra Nilesh</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">{role}</span>
-                    </div>
-                    <img
-                      src="https://i.pravatar.cc/40?img=35"
-                      alt="User avatar"
-                      className="h-8 w-8 sm:h-9 sm:w-9 rounded-full border-2 border-white dark:border-gray-700 shadow-md hover:scale-105 transition-transform duration-200"
-                    />
-                    <i className="ri-arrow-down-s-line text-gray-500 hidden sm:block transition-transform duration-200"></i>
-                  </button>
-                  {isProfileOpen && (
-                    <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden animate-slideDown">
-                      <Link
-                        to="student/profile"
-                        className="flex items-center gap-3 px-4 py-3 text-gray-800 dark:text-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-colors duration-200"
-                      >
-                        <i className="ri-user-line text-lg"></i>
-                        <span className="font-medium">Profile</span>
-                      </Link>
-                      <Link
-                        to="student/upload-marksheet"
-                        className="flex items-center gap-3 px-4 py-3 text-gray-800 dark:text-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-colors duration-200"
-                      >
-                        <i className="ri-settings-3-line text-lg"></i>
-                        <span className="font-medium">Upload Marksheets</span>
-                      </Link>
-                      <hr className="border-gray-200/50 dark:border-gray-700/50" />
-                      <button className="flex items-center gap-3 w-full text-left px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/20 transition-colors duration-200">
-                        <i className="ri-logout-box-line text-lg"></i>
-                        <span className="font-medium">Logout</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
               </div>
             </div>
-          </header>
+            <div className="max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+              {notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`p-3 sm:p-4 border-b border-gray-100/50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200 ${notification.unread ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''}`}
+                >
+                  <p className="text-sm text-gray-800 dark:text-gray-200 mb-1 font-medium">{notification.message}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{notification.time}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <button
+        onClick={() => setDarkMode(!darkMode)}
+        className="p-2 sm:p-2.5 lg:p-3 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+        aria-label="Toggle dark mode"
+      >
+        <i
+          className={`ri-${darkMode ? 'sun' : 'moon'}-line text-lg sm:text-xl text-gray-600 dark:text-gray-300 transition-transform duration-300 ${darkMode ? 'rotate-180' : 'rotate-0'}`}
+        ></i>
+      </button>
+
+      <div className="relative dropdown-container">
+        <button
+          onClick={() => setIsProfileOpen(!isProfileOpen)}
+          className="flex items-center gap-2 p-1 sm:p-2 rounded-xl hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+          aria-label="Profile menu"
+          aria-expanded={isProfileOpen}
+        >
+          <div className="text-right hidden md:block">
+            <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 block">
+              {role === 'company' ? user.company?.companyName : role === 'student' ? user.student?.name : 'Admin User'}
+            </span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+              {role}
+            </span>
+          </div>
+          <img
+            src={
+              role === 'company'
+                ? user.company?.companyProfile || 'https://via.placeholder.com/150'
+                : role === 'student'
+                ? user.student?.profilePhoto || 'https://via.placeholder.com/150'
+                : 'https://via.placeholder.com/150'
+            }
+            alt="User avatar"
+            className="h-8 w-8 sm:h-9 sm:w-9 rounded-full border-2 border-white dark:border-gray-700 shadow-md hover:scale-105 transition-transform duration-200"
+          />
+          <i className="ri-arrow-down-s-line text-gray-500 hidden sm:block transition-transform duration-200"></i>
+        </button>
+        {isProfileOpen && (
+          <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden animate-slideDown">
+            <Link
+              to="student/profile"
+              className="flex items-center gap-3 px-4 py-3 text-gray-800 dark:text-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-colors duration-200"
+            >
+              <i className="ri-user-line text-lg"></i>
+              <span className="font-medium">Profile</span>
+            </Link>
+            <Link
+              to="student/upload-marksheet"
+              className="flex items-center gap-3 px-4 py-3 text-gray-800 dark:text-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-colors duration-200"
+            >
+              <i className="ri-settings-3-line text-lg"></i>
+              <span className="font-medium">Upload Marksheets</span>
+            </Link>
+            <hr className="border-gray-200/50 dark:border-gray-700/50" />
+            <button className="flex items-center gap-3 w-full text-left px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/20 transition-colors duration-200">
+              <i className="ri-logout-box-line text-lg"></i>
+              <span className="font-medium">Logout</span>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</header>
 
           {/* Main Content Area */}
           <main className="flex-1 overflow-auto">

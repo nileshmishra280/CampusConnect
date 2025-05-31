@@ -1,17 +1,11 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext'
 
 const StudentProfile = () => {
-  // Student data (only user-facing details)
-  const student = {
-    prn: '8022053529',
-    name: 'Aliabbas Bhaisaheb',
-    email: 'aliabbasbhaisaheb@gmail.com',
-    profilePhoto: 'https://res.cloudinary.com/dsudmmvkj/image/upload/v1747537251/tnp_prof',
-    phone: '9070413892',
-    address: 'India',
-  };
 
+  const { user } = useAuth();
+  const student = user;
   // Sync theme from localStorage
   useEffect(() => {
     const theme = localStorage.getItem('theme');
@@ -30,14 +24,14 @@ const StudentProfile = () => {
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 sm:p-8">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
             <img
-              src={student.profilePhoto}
-              alt={`${student.name}'s profile`}
+              src={user.student?.profilePhoto || 'https://via.placeholder.com/150'}
+              alt={`${user.student.name}'s profile`}
               onError={(e) => (e.target.src = '')}
               className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white dark:border-gray-700 shadow-lg object-cover transform hover:scale-105 transition-transform duration-300"
             />
             <div className="text-center sm:text-left">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white">{student.name}</h1>
-              <p className="text-sm sm:text-base text-blue-100 mt-2">PRN: {student.prn}</p>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white">{user.student.name}</h1>
+              <p className="text-sm sm:text-base text-blue-100 mt-2">PRN: {user.student.prn}</p>
             </div>
           </div>
         </div>
@@ -50,20 +44,20 @@ const StudentProfile = () => {
             <div className="flex flex-col">
               <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Email</label>
               <p className="mt-1 text-base text-gray-800 dark:text-gray-200 truncate" title={student.email}>
-                {student.email}
+                {user.student.email}
               </p>
             </div>
 
             {/* Phone */}
             <div className="flex flex-col">
               <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Phone</label>
-              <p className="mt-1 text-base text-gray-800 dark:text-gray-200">{student.phone}</p>
+              <p className="mt-1 text-base text-gray-800 dark:text-gray-200">{user.student.phone}</p>
             </div>
 
             {/* Address */}
             <div className="flex flex-col">
               <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Address</label>
-              <p className="mt-1 text-base text-gray-800 dark:text-gray-200">{student.address}</p>
+              <p className="mt-1 text-base text-gray-800 dark:text-gray-200">{user.student.address}</p>
             </div>
           </div>
 
