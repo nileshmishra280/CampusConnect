@@ -1,8 +1,14 @@
 import React from 'react'
 
+import PostJob from './PostJob'
+
 const CompanyDashboard = () => {
   return (
-    <div>CompanyDashboard</div>
+    <div>
+
+      <PostJob/>
+
+    </div>
   )
 }
 
