@@ -50,10 +50,19 @@
 
 
 import React from 'react'
+import { useAuth } from '../../context/AuthContext'
+import UploadMarksheet from './UploadMarksheet'
+import AvailableJobs from './AvailableJobs'
 
 const studentDashboard = () => {
   return (
-    <div>studentDashboard</div>
+    <div>
+
+      <AvailableJobs />
+
+      <UploadMarksheet />
+      
+    </div>
   )
 }
 

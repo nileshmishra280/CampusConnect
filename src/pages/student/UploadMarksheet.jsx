@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 //import { postData } from '../utils/axios'; // Adjust path as needed
+import { fetchPercentage, uploadConfirmedMarks, uploadManualMarks } from '../../api/studentApi';
+import { useAuth } from '../../context/AuthContext'; // Adjust path as needed
 
 const UploadMarksheet = () => {
+  const { user } = useAuth();
   const [images, setImages] = useState({
     std10: null,
     std12OrDiploma: null,
     college: null,
+    resume: null,
   });
   const [marks, setMarks] = useState({
     tenth: '',
@@ -27,7 +31,7 @@ const UploadMarksheet = () => {
     }
 
     setImages((prev) => ({ ...prev, [name]: files[0] }));
-    setError(null);
+    setError('');
   };
 
   // Handle form submission to fetch marks
@@ -43,34 +47,40 @@ const UploadMarksheet = () => {
       return;
     }
 
+    if (!user?.student?.prn) {
+      setLoading(false);
+      setError('User PRN not found. Please log in again.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('images', images.std10);
     formData.append('images', images.std12OrDiploma);
     formData.append('images', images.college);
+    if (images.resume) {
+      formData.append('resume', images.resume);
+    }
+    formData.append('prn', user.student.prn);
 
     try {
-      const res = await fetch('http://localhost:5000/student/uploadDetails', {
-        method: 'POST',
-        body: formData,
-      });
+      const res = await fetchPercentage(formData);
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        setError(data.error || 'Upload failed');
+      if (!res.success) {
+        setError(res.error || 'Failed to fetch marks');
         setLoading(false);
         return;
       }
 
-      // Parse the new response format
+      // Parse the backend response
       setMarks({
-        tenth: data.std10_percentage ? data.std10_percentage.replace('%', '') : '',
-        twelfth: data.std12_percentage ? data.std12_percentage.replace('%', '') : data.diploma_cgpa || '',
-        cgpa: data.college_cgpa || '',
+        tenth: res.data.std10_percentage ? res.data.std10_percentage.replace('%', '') : '',
+        twelfth: res.data.std12_or_diploma ? res.data.std12_or_diploma.replace('%', '') : '',
+        cgpa: res.data.college_cgpa || '',
       });
       setShowConfirmation(true);
-      setResponse(data);
+      setResponse(res);
     } catch (err) {
-      setError('Network error: ' + err.message);
+      setError(err.message || 'Network error');
     } finally {
       setLoading(false);
     }
@@ -84,61 +94,48 @@ const UploadMarksheet = () => {
     }
   };
 
-  // Confirm auto-filled marks and submit
+  // Confirm auto-filled marks and upload
   const handleConfirmMarks = async () => {
     setShowConfirmation(false);
     setLoading(true);
+
+    if (!user?.student?.prn) {
+      setError('User PRN not found. Please log in again.');
+      setLoading(false);
+      return;
+    }
 
     const formData = new FormData();
     formData.append('images', images.std10);
     formData.append('images', images.std12OrDiploma);
     formData.append('images', images.college);
+    if (images.resume) {
+      formData.append('resume', images.resume);
+    }
     formData.append('std10_percentage', parseFloat(marks.tenth) || 0);
-    formData.append('std12_percentage', marks.twelfth ? parseFloat(marks.twelfth) || 0 : null);
-    formData.append('diploma_cgpa', marks.twelfth ? null : parseFloat(marks.twelfth) || 0);
+    formData.append('std12_percentage', marks.twelfth && !response?.data?.std12_or_diploma.includes('.') ? parseFloat(marks.twelfth) || 0 : null);
+    formData.append('diploma_cgpa', marks.twelfth && response?.data?.std12_or_diploma.includes('.') ? parseFloat(marks.twelfth) || 0 : null);
     formData.append('college_cgpa', marks.cgpa || '');
+    formData.append('prn', user.student.prn);
 
     try {
-      const res = await fetch('http://localhost:5000/student/uploadDetails', {
-        method: 'POST',
-        body: formData,
-      });
+      const data = await uploadConfirmedMarks(formData);
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
+      if (!data.success) {
         setError(data.error || 'Upload failed');
         setLoading(false);
         return;
       }
 
       setResponse(data);
-      setImages({ std10: null, std12OrDiploma: null, college: null });
+      setImages({ std10: null, std12OrDiploma: null, college: null, resume: null });
       setMarks({ tenth: '', twelfth: '', cgpa: '' });
       setManualEntry(false);
     } catch (err) {
-      setError('Network error: ' + err.message);
+      setError(err.message || 'Network error');
     } finally {
       setLoading(false);
     }
-
-    // const formData = new FormData();
-    // formData.append('std10', images.std10);
-    // formData.append('std12OrDiploma', images.std12OrDiploma);
-    // formData.append('college', images.college);
-    // formData.append('marks', JSON.stringify(marks));
-    // const success = await postData({
-    //   url: 'http://localhost:3000/api/users/marksheet',
-    //   formData,
-    //   setError,
-    //   setResponse,
-    // });
-
-    // if (success) {
-    //   setImages({ std10: null, std12OrDiploma: null, college: null });
-    //   setMarks({ tenth: '', twelfth: '', college: '' });
-    //   setManualEntry(false);
-    // }
-    // setLoading(false);
   };
 
   // Enable manual entry mode
@@ -156,59 +153,44 @@ const UploadMarksheet = () => {
       return;
     }
 
+    if (!user?.student?.prn) {
+      setError('User PRN not found. Please log in again.');
+      setLoading(false);
+      return;
+    }
+
     const formData = new FormData();
     formData.append('images', images.std10);
     formData.append('images', images.std12OrDiploma);
     formData.append('images', images.college);
+    if (images.resume) {
+      formData.append('resume', images.resume);
+    }
     formData.append('std10_percentage', parseFloat(marks.tenth) || 0);
-    formData.append('std12_percentage', marks.twelfth ? parseFloat(marks.twelfth) || 0 : null);
-    formData.append('diploma_cgpa', marks.twelfth ? null : parseFloat(marks.twelfth) || 0);
+    formData.append('std12_percentage', marks.twelfth && !marks.twelfth.includes('.') ? parseFloat(marks.twelfth) || 0 : null);
+    formData.append('diploma_cgpa', marks.twelfth && marks.twelfth.includes('.') ? parseFloat(marks.twelfth) || 0 : null);
     formData.append('college_cgpa', marks.cgpa || '');
+    formData.append('prn', user.student.prn);
     formData.append('isManual', 'true');
 
     try {
-      const res = await fetch('http://localhost:5000/student/uploadDetails', {
-        method: 'POST',
-        body: formData,
-      });
+      const data = await uploadManualMarks(formData);
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
+      if (!data.success) {
         setError(data.error || 'Upload failed');
         setLoading(false);
         return;
       }
 
       setResponse(data);
-      setImages({ std10: null, std12OrDiploma: null, college: null });
+      setImages({ std10: null, std12OrDiploma: null, college: null, resume: null });
       setMarks({ tenth: '', twelfth: '', cgpa: '' });
       setManualEntry(false);
     } catch (err) {
-      setError('Network error: ' + err.message);
+      setError(err.message || 'Network error');
     } finally {
       setLoading(false);
     }
-
-    // const formData = new FormData();
-    // formData.append('std10', images.std10);
-    // formData.append('std12OrDiploma', images.std12OrDiploma);
-    // formData.append('college', images.college);
-    // formData.append('marks', JSON.stringify(marks));
-    // formData.append('isManual', 'true');
-
-    // const success = await postData({
-    //   url: 'http://localhost:3000/api/users/marksheet',
-    //   formData,
-    //   setError,
-    //   setResponse,
-    // });
-
-    // if (success) {
-    //   setImages({ std10: null, std12OrDiploma: null, college: null });
-    //   setMarks({ tenth: '', twelfth: '', college: '' });
-    //   setManualEntry(false);
-    // }
-    // setLoading(false);
   };
 
   return (
@@ -218,7 +200,7 @@ const UploadMarksheet = () => {
           Upload Academic Marksheets
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {['std10', 'std12OrDiploma', 'college'].map((field) => (
+          {['std10', 'std12OrDiploma', 'college', 'resume'].map((field) => (
             <div key={field}>
               <label
                 htmlFor={field}
@@ -228,13 +210,15 @@ const UploadMarksheet = () => {
                   ? 'Class 10th Marksheet'
                   : field === 'std12OrDiploma'
                   ? 'Class 12th or Diploma Marksheet'
-                  : 'College Marksheet'}
+                  : field === 'college'
+                  ? 'College Marksheet'
+                  : 'Resume (PDF)'}
               </label>
               <input
                 type="file"
                 id={field}
                 name={field}
-                accept="image/*"
+                accept={field === 'resume' ? 'application/pdf' : 'image/*'}
                 onChange={handleFileChange}
                 className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300 dark:hover:file:bg-blue-800 transition-all"
               />
@@ -250,7 +234,7 @@ const UploadMarksheet = () => {
             className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md disabled:opacity-50"
             disabled={loading}
           >
-            {loading ? 'Uploading...' : 'Upload'}
+            {loading ? 'Fetching...' : 'Fetch Marks'}
           </button>
         </form>
 
@@ -259,7 +243,7 @@ const UploadMarksheet = () => {
           <div className="mt-6 flex flex-col items-center">
             <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-blue-600 border-solid"></div>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Fetching percentages...
+              {showConfirmation ? 'Uploading...' : 'Fetching percentages...'}
             </p>
           </div>
         )}
@@ -293,10 +277,17 @@ const UploadMarksheet = () => {
                       manualEntry ? 'border-gray-300 dark:border-gray-600' : 'border-transparent'
                     }`}
                   />
+                  {response?.data?.std10_calculation_steps && (
+                    <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                      {response.data.std10_calculation_steps.map((step, idx) => (
+                        <p key={idx}>{step}</p>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Class 12th/Diploma Percentage
+                    Class 12th/Diploma
                   </label>
                   <input
                     type="text"
@@ -308,6 +299,13 @@ const UploadMarksheet = () => {
                       manualEntry ? 'border-gray-300 dark:border-gray-600' : 'border-transparent'
                     }`}
                   />
+                  {response?.data?.std12_calculation_steps && (
+                    <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                      {response.data.std12_calculation_steps.map((step, idx) => (
+                        <p key={idx}>{step}</p>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -348,7 +346,7 @@ const UploadMarksheet = () => {
                       onClick={handleConfirmMarks}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
                     >
-                      Confirm & Save
+                      Confirm & Upload
                     </button>
                   </>
                 ) : (
@@ -368,13 +366,35 @@ const UploadMarksheet = () => {
         {response && !showConfirmation && (
           <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg animate-fadeIn">
             <h3 className="text-lg font-semibold text-green-700 dark:text-green-400 mb-2">
-              {response.requiresVerification ? 'Upload Pending Verification' : 'Upload Successful'}
+              {response.data?.isManual ? 'Upload Pending Verification' : 'Upload Successful'}
             </h3>
             <p className="text-sm text-gray-800 dark:text-gray-200">
-              {response.requiresVerification
+              {response.data?.isManual
                 ? 'Your manually entered marks are awaiting admin verification.'
                 : 'Marksheets and marks uploaded successfully.'}
             </p>
+            {response.data?.prn && (
+              <p className="text-sm text-gray-800 dark:text-gray-200 mt-2">
+                PRN: {response.data.prn}
+              </p>
+            )}
+            {response.data?.status && (
+              <p className="text-sm text-gray-800 dark:text-gray-200 mt-2">
+                Status: {response.data.status}
+              </p>
+            )}
+            {response.data?.resume_url && (
+              <p className="text-sm text-gray-800 dark:text-gray-200 mt-2">
+                <a
+                  href={response.data.resume_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  View Uploaded Resume
+                </a>
+              </p>
+            )}
           </div>
         )}
       </div>
