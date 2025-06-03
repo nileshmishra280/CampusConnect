@@ -17,7 +17,6 @@ export const AuthProvider = ({ children }) => {
 
       const role = localStorage.getItem('role');
       setUserType(role);
-      console.log('User role from localStorage:', role);
 
       let token;
       if (role === 'student') {
@@ -45,7 +44,6 @@ export const AuthProvider = ({ children }) => {
         // Admin data fetch can be added if needed
         userData = { role: 'admin' }; // Placeholder for admin data
       }
-
       setUser(userData);
     } catch (err) {
       console.error('Error loading user:', err);
@@ -67,7 +65,6 @@ export const AuthProvider = ({ children }) => {
     const handleStorageChange = () => {
       const newRole = localStorage.getItem('role');
       if (newRole !== userType) {
-        console.log('Role changed in localStorage, reloading user:', newRole);
         loadData(); // Reload user data when role changes
       }
     };

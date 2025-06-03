@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { fetchAvailableJobs } from '../../api/studentApi';
+import { useAuth } from '../../context/AuthContext';
 
 const AvailableJobs = () => {
+    const { user } = useAuth();
     const [jobs, setJobs] = useState([]);
     const [filteredJobs, setFilteredJobs] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -16,9 +18,21 @@ const AvailableJobs = () => {
             await new Promise((resolve) => setTimeout(resolve, 1000));
             try {
                 const response = await fetchAvailableJobs();
-                if (Array.isArray(response)) {
-                    setJobs(response);
-                    setFilteredJobs(response);
+                const eligibleJobs = response.filter(job => {
+                    const requiredCgpa = job.education?.college;
+                    const requiredDept = job.department;
+                    const requiredStd12OrDipMks=job.education.std12_or_diploma;
+                    const requiredStd10mks=job.education.std10;
+                    return (
+                        user.student.education.college.cmks * 10 >= requiredCgpa && 
+                        user.student.education.std12_or_diploma.mks12 >=requiredStd12OrDipMks &&
+                        user.student.education.std10.mks10>=requiredStd10mks &&
+                        user.student.department === requiredDept
+                    );
+                });
+                if (Array.isArray(eligibleJobs)) {
+                    setJobs(eligibleJobs);
+                    setFilteredJobs(eligibleJobs);
                 } else {
                     toast.error('Invalid response from server.', {
                         position: 'top-right',
@@ -146,9 +160,17 @@ const AvailableJobs = () => {
                                     {/* Left Column */}
                                     <div className="flex-1 space-y-2">
                                         <div className="flex items-start gap-2">
+                                            <i className="ri-building-line text-emerald-500 dark:text-emerald-400 text-lg mt-0.5"></i>
+                                            <div>
+                                                <p className="font-semibold text-gray-800 dark:text-gray-100 text-xs">Company name:</p>
+                                                <p className="text-xs">{job.companyDetails.companyName || 'N/A'}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-start gap-2">
                                             <i className="ri-file-text-line text-emerald-500 dark:text-emerald-400 text-lg mt-0.5"></i>
                                             <div>
-                                                <p className="font-semibold text-gray-800 dark:text-gray-100 text-xs">Description:</p>
+                                                <p className="font-semibold text-gray-800 dark:text-gray-100 text-xs">Job description:</p>
                                                 <p className="text-xs">{truncateDescription(job.jobDescription)}</p>
                                             </div>
                                         </div>
@@ -169,13 +191,7 @@ const AvailableJobs = () => {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-start gap-2">
-                                            <i className="ri-building-4-line text-emerald-500 dark:text-emerald-400 text-lg mt-0.5"></i>
-                                            <div>
-                                                <p className="font-semibold text-gray-800 dark:text-gray-100 text-xs">Work Model:</p>
-                                                <p className="text-xs">{job.workModel || 'N/A'}</p>
-                                            </div>
-                                        </div>
+                                        
                                     </div>
 
                                     {/* Right Column */}
@@ -197,12 +213,14 @@ const AvailableJobs = () => {
                                         </div>
 
                                         <div className="flex items-start gap-2">
-                                            <i className="ri-id-card-line text-emerald-500 dark:text-emerald-400 text-lg mt-0.5"></i>
+                                            <i className="ri-building-4-line text-emerald-500 dark:text-emerald-400 text-lg mt-0.5"></i>
                                             <div>
-                                                <p className="font-semibold text-gray-800 dark:text-gray-100 text-xs">Company ID:</p>
-                                                <p className="text-xs">{job.companyId || 'N/A'}</p>
+                                                <p className="font-semibold text-gray-800 dark:text-gray-100 text-xs">Work Model:</p>
+                                                <p className="text-xs">{job.workModel || 'N/A'}</p>
                                             </div>
                                         </div>
+
+                                        
                                     </div>
                                 </div>
 

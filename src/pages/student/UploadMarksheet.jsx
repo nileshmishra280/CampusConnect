@@ -21,6 +21,7 @@ const UploadMarksheet = () => {
   const [loading, setLoading] = useState(false);
   const [manualEntry, setManualEntry] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [department, setDepartment] = useState("");
 
   // Handle file selection
   const handleFileChange = async (e) => {
@@ -197,9 +198,28 @@ const UploadMarksheet = () => {
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center p-4 sm:p-6">
       <div className="max-w-md sm:max-w-lg lg:max-w-xl w-full bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 sm:p-8 transition-all duration-300">
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-200 text-center mb-6 sm:mb-8">
-          Upload Academic Marksheets
+          Academic Details
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label
+              htmlFor="department"
+              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >Department</label>
+            <select
+              id="department"
+              name="department"
+              onChange={(e) => setDepartment(e.target.value)}
+              className="block w-full text-sm text-gray-500 dark:text-gray-400 transition-all border border-gray-300 dark:border-gray-700 rounded-md p-2"
+              value={department} // optional: if you want to make it controlled
+            >
+              <option value="">Select Department</option>
+              <option value="CSE">CSE</option>
+              <option value="ME">ME</option>
+              <option value="EE">EE</option>
+              <option value="TE">TE</option>
+            </select>
+          </div>
           {['std10', 'std12OrDiploma', 'college', 'resume'].map((field) => (
             <div key={field}>
               <label
@@ -209,10 +229,10 @@ const UploadMarksheet = () => {
                 {field === 'std10'
                   ? 'Class 10th Marksheet'
                   : field === 'std12OrDiploma'
-                  ? 'Class 12th or Diploma Marksheet'
-                  : field === 'college'
-                  ? 'College Marksheet'
-                  : 'Resume (PDF)'}
+                    ? 'Class 12th or Diploma Marksheet'
+                    : field === 'college'
+                      ? 'College Marksheet'
+                      : 'Resume (PDF)'}
               </label>
               <input
                 type="file"
@@ -273,9 +293,8 @@ const UploadMarksheet = () => {
                     value={marks.tenth}
                     onChange={handleManualChange}
                     readOnly={!manualEntry}
-                    className={`w-full p-2 mt-1 rounded-lg border bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                      manualEntry ? 'border-gray-300 dark:border-gray-600' : 'border-transparent'
-                    }`}
+                    className={`w-full p-2 mt-1 rounded-lg border bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${manualEntry ? 'border-gray-300 dark:border-gray-600' : 'border-transparent'
+                      }`}
                   />
                   {response?.data?.std10_calculation_steps && (
                     <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -295,9 +314,8 @@ const UploadMarksheet = () => {
                     value={marks.twelfth}
                     onChange={handleManualChange}
                     readOnly={!manualEntry}
-                    className={`w-full p-2 mt-1 rounded-lg border bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                      manualEntry ? 'border-gray-300 dark:border-gray-600' : 'border-transparent'
-                    }`}
+                    className={`w-full p-2 mt-1 rounded-lg border bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${manualEntry ? 'border-gray-300 dark:border-gray-600' : 'border-transparent'
+                      }`}
                   />
                   {response?.data?.std12_calculation_steps && (
                     <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -317,9 +335,8 @@ const UploadMarksheet = () => {
                     value={marks.cgpa}
                     onChange={handleManualChange}
                     readOnly={!manualEntry}
-                    className={`w-full p-2 mt-1 rounded-lg border bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                      manualEntry ? 'border-gray-300 dark:border-gray-600' : 'border-transparent'
-                    }`}
+                    className={`w-full p-2 mt-1 rounded-lg border bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${manualEntry ? 'border-gray-300 dark:border-gray-600' : 'border-transparent'
+                      }`}
                   />
                 </div>
                 {!manualEntry && (

@@ -67,7 +67,6 @@ const LoginPage = () => {
       // Update AuthContext state with the full user data
       setUserType(role);
       setUser(userData);
-
       toast.success(data.message || 'Login successful! Redirecting...', { position: 'top-right' });
 
       // Redirect to role-specific dashboard
