@@ -32,13 +32,13 @@ const FormSection = ({ title, isOpen, toggle, icon, children }) => (
 const AddCompany = () => {
   const [formData, setFormData] = useState({
     companyId: '',
-    companyName: '',
+    // companyName: '',
     password: '',
-    hasAdded: false,
-    description: '',
+    // hasAdded: false,
+    // description: '',
   });
 
-  const [companyPhoto, setCompanyPhoto] = useState(null); // State for the file
+  // const [companyPhoto, setCompanyPhoto] = useState(null); // State for the file
   const [isFormOpen, setIsFormOpen] = useState(true); // Top-level collapse state
   const [openSections, setOpenSections] = useState({
     basicInfo: true,
@@ -63,24 +63,28 @@ const AddCompany = () => {
     });
   };
 
-  const handleFileChange = (e) => {
-    setCompanyPhoto(e.target.files[0]);
-  };
+  // const handleFileChange = (e) => {
+  //   setCompanyPhoto(e.target.files[0]);
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true); // Start loading
 
     // Create FormData object to handle file upload
-    const data = new FormData();
-    data.append('companyId', formData.companyId);
-    data.append('companyName', formData.companyName);
-    data.append('password', formData.password);
-    data.append('hasAdded', formData.hasAdded);
-    data.append('description', formData.description);
-    if (companyPhoto) {
-      data.append('companyPhoto', companyPhoto); // Append the file
-    }
+    // const data = new FormData();
+    // data.append('companyId', formData.companyId);
+    // data.append('companyName', formData.companyName);
+    // data.append('password', formData.password);
+    // data.append('hasAdded', formData.hasAdded);
+    // data.append('description', formData.description);
+    // if (companyPhoto) {
+    //   data.append('companyPhoto', companyPhoto); // Append the file
+    // }
+    const data = {
+      companyId: formData.companyId,
+      password: formData.password,
+    };
 
     try {
       const response = await addCompany(data);
@@ -95,12 +99,12 @@ const AddCompany = () => {
         });
         setFormData({
           companyId: '',
-          companyName: '',
+          // companyName: '',
           password: '',
-          hasAdded: false,
-          description: '',
+          // hasAdded: false,
+          // description: '',
         });
-        setCompanyPhoto(null); // Reset the file input
+        // setCompanyPhoto(null); // Reset the file input
       }
     } catch (err) {
       toast.error(err.error || 'Failed to add company', {
@@ -160,28 +164,6 @@ const AddCompany = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Company Name
-                    </label>
-                    <input
-                      type="text"
-                      name="companyName"
-                      value={formData.companyName}
-                      onChange={handleChange}
-                      className="block w-full p-2 sm:p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                </div>
-              </FormSection>
-
-              <FormSection
-                title="Security"
-                isOpen={openSections.security}
-                toggle={() => toggleSection('security')}
-                icon="ri-key-line"
-              >
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Password
                     </label>
                     <input
@@ -193,6 +175,29 @@ const AddCompany = () => {
                       required
                     />
                   </div>
+                  {/* <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Company Name
+                    </label>
+                    <input
+                      type="text"
+                      name="companyName"
+                      value={formData.companyName}
+                      onChange={handleChange}
+                      className="block w-full p-2 sm:p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div> */}
+                </div>
+              </FormSection>
+
+              {/* <FormSection
+                title="Security"
+                isOpen={openSections.security}
+                toggle={() => toggleSection('security')}
+                icon="ri-key-line"
+              >
+                <div className="space-y-4">
+                  
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -240,14 +245,13 @@ const AddCompany = () => {
                     />
                   </div>
                 </div>
-              </FormSection>
+              </FormSection> */}
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 ${
-                  isLoading ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+                className={`w-full flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
               >
                 {isLoading ? (
                   <>

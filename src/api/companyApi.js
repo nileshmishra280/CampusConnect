@@ -10,3 +10,13 @@ export const postJob = async (jobData) => {
         throw error.response ? error.response.data : error;
     }
 }
+
+export const addCompanydetails = async (formData) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/company/addInformation`, formData);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching marks:', error);
+        throw error.response ? error.response.data : { message: 'Network error', success: false };
+    }
+};
