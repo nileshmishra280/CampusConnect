@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API_BASE_URL = 'http://localhost:4000'; 
+const API_BASE_URL = 'http://localhost:5000'; 
 
 export const fetchAvailableJobs = async () => {
     try {
@@ -39,6 +39,19 @@ export const uploadManualMarks = async (formData) => {
         console.error('Error uploading manual marks:', error);
         throw error.response ? error.response.data : { message: 'Network error', success: false };
     }
+};
+
+
+export const fetchInterviewQuestions = async (resumeUrl, numQuestions) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/student/getQuestionFromResume`, {
+      resumeUrl,
+      numQuestions
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch questions');
+  }
 };
 
 // export const fetchJobs = async (token) => {

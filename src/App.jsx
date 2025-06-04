@@ -10,6 +10,7 @@ import StudentDashboard from './pages/student/StudentDashboard';
 import StudentProfile from './pages/student/StudentProfile';
 import CompanyDashboard from './pages/company/CompanyDashboard';
 import JobInfo from './pages/JobInfo';
+import Loader from './components/Loader';
 
 const App = () => {
   return <AppRoutes />;
@@ -19,7 +20,7 @@ const AppRoutes = () => {
   const { user, userType, loading, error } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
 
   console.log('User:', user);

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-//import { postData } from '../utils/axios'; // Adjust path as needed
 import { fetchPercentage, uploadConfirmedMarks, uploadManualMarks } from '../../api/studentApi';
-import { useAuth } from '../../context/AuthContext'; // Adjust path as needed
+import { useAuth } from '../../context/AuthContext';
 
 const UploadMarksheet = () => {
   const { user } = useAuth();
@@ -21,7 +20,7 @@ const UploadMarksheet = () => {
   const [loading, setLoading] = useState(false);
   const [manualEntry, setManualEntry] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [department, setDepartment] = useState("");
+  const [department, setDepartment] = useState('');
 
   // Handle file selection
   const handleFileChange = async (e) => {
@@ -48,6 +47,12 @@ const UploadMarksheet = () => {
       return;
     }
 
+    if (!department) {
+      setLoading(false);
+      setError('Please select a department.');
+      return;
+    }
+
     if (!user?.student?.prn) {
       setLoading(false);
       setError('User PRN not found. Please log in again.');
@@ -62,6 +67,7 @@ const UploadMarksheet = () => {
       formData.append('resume', images.resume);
     }
     formData.append('prn', user.student.prn);
+    formData.append('department', department); // Add department to FormData
 
     try {
       const res = await fetchPercentage(formData);
@@ -72,7 +78,6 @@ const UploadMarksheet = () => {
         return;
       }
 
-      // Parse the backend response
       setMarks({
         tenth: res.data.std10_percentage ? res.data.std10_percentage.replace('%', '') : '',
         twelfth: res.data.std12_or_diploma ? res.data.std12_or_diploma.replace('%', '') : '',
@@ -118,6 +123,12 @@ const UploadMarksheet = () => {
     formData.append('diploma_cgpa', marks.twelfth && response?.data?.std12_or_diploma.includes('.') ? parseFloat(marks.twelfth) || 0 : null);
     formData.append('college_cgpa', marks.cgpa || '');
     formData.append('prn', user.student.prn);
+    formData.append('department', department); // Add department to FormData
+
+    console.log('--- Full FormData Content ---');
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
 
     try {
       const data = await uploadConfirmedMarks(formData);
@@ -131,6 +142,7 @@ const UploadMarksheet = () => {
       setResponse(data);
       setImages({ std10: null, std12OrDiploma: null, college: null, resume: null });
       setMarks({ tenth: '', twelfth: '', cgpa: '' });
+      setDepartment(''); // Reset department after successful upload
       setManualEntry(false);
     } catch (err) {
       setError(err.message || 'Network error');
@@ -154,6 +166,12 @@ const UploadMarksheet = () => {
       return;
     }
 
+    if (!department) {
+      setError('Please select a department.');
+      setLoading(false);
+      return;
+    }
+
     if (!user?.student?.prn) {
       setError('User PRN not found. Please log in again.');
       setLoading(false);
@@ -173,6 +191,7 @@ const UploadMarksheet = () => {
     formData.append('college_cgpa', marks.cgpa || '');
     formData.append('prn', user.student.prn);
     formData.append('isManual', 'true');
+    formData.append('department', department); // Add department to FormData
 
     try {
       const data = await uploadManualMarks(formData);
@@ -186,6 +205,7 @@ const UploadMarksheet = () => {
       setResponse(data);
       setImages({ std10: null, std12OrDiploma: null, college: null, resume: null });
       setMarks({ tenth: '', twelfth: '', cgpa: '' });
+      setDepartment(''); // Reset department after successful upload
       setManualEntry(false);
     } catch (err) {
       setError(err.message || 'Network error');
@@ -205,13 +225,15 @@ const UploadMarksheet = () => {
             <label
               htmlFor="department"
               className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >Department</label>
+            >
+              Department
+            </label>
             <select
               id="department"
               name="department"
               onChange={(e) => setDepartment(e.target.value)}
+              value={department}
               className="block w-full text-sm text-gray-500 dark:text-gray-400 transition-all border border-gray-300 dark:border-gray-700 rounded-md p-2"
-              value={department} // optional: if you want to make it controlled
             >
               <option value="">Select Department</option>
               <option value="CSE">CSE</option>
@@ -229,10 +251,10 @@ const UploadMarksheet = () => {
                 {field === 'std10'
                   ? 'Class 10th Marksheet'
                   : field === 'std12OrDiploma'
-                    ? 'Class 12th or Diploma Marksheet'
-                    : field === 'college'
-                      ? 'College Marksheet'
-                      : 'Resume (PDF)'}
+                  ? 'Class 12th or Diploma Marksheet'
+                  : field === 'college'
+                  ? 'College Marksheet'
+                  : 'Resume (PDF)'}
               </label>
               <input
                 type="file"
@@ -285,6 +307,14 @@ const UploadMarksheet = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Department
+                  </label>
+                  <p className="w-full p-2 mt-1 rounded-lg border bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                    {department}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Class 10th Percentage
                   </label>
                   <input
@@ -293,8 +323,9 @@ const UploadMarksheet = () => {
                     value={marks.tenth}
                     onChange={handleManualChange}
                     readOnly={!manualEntry}
-                    className={`w-full p-2 mt-1 rounded-lg border bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${manualEntry ? 'border-gray-300 dark:border-gray-600' : 'border-transparent'
-                      }`}
+                    className={`w-full p-2 mt-1 rounded-lg border bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                      manualEntry ? 'border-gray-300 dark:border-gray-600' : 'border-transparent'
+                    }`}
                   />
                   {response?.data?.std10_calculation_steps && (
                     <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -314,8 +345,9 @@ const UploadMarksheet = () => {
                     value={marks.twelfth}
                     onChange={handleManualChange}
                     readOnly={!manualEntry}
-                    className={`w-full p-2 mt-1 rounded-lg border bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${manualEntry ? 'border-gray-300 dark:border-gray-600' : 'border-transparent'
-                      }`}
+                    className={`w-full p-2 mt-1 rounded-lg border bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                      manualEntry ? 'border-gray-300 dark:border-gray-600' : 'border-transparent'
+                    }`}
                   />
                   {response?.data?.std12_calculation_steps && (
                     <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -335,8 +367,9 @@ const UploadMarksheet = () => {
                     value={marks.cgpa}
                     onChange={handleManualChange}
                     readOnly={!manualEntry}
-                    className={`w-full p-2 mt-1 rounded-lg border bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${manualEntry ? 'border-gray-300 dark:border-gray-600' : 'border-transparent'
-                      }`}
+                    className={`w-full p-2 mt-1 rounded-lg border bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                      manualEntry ? 'border-gray-300 dark:border-gray-600' : 'border-transparent'
+                    }`}
                   />
                 </div>
                 {!manualEntry && (
@@ -393,6 +426,11 @@ const UploadMarksheet = () => {
             {response.data?.prn && (
               <p className="text-sm text-gray-800 dark:text-gray-200 mt-2">
                 PRN: {response.data.prn}
+              </p>
+            )}
+            {department && (
+              <p className="text-sm text-gray-800 dark:text-gray-200 mt-2">
+                Department: {department}
               </p>
             )}
             {response.data?.status && (

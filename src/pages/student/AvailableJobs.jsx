@@ -18,6 +18,7 @@ const AvailableJobs = () => {
             await new Promise((resolve) => setTimeout(resolve, 1000));
             try {
                 const response = await fetchAvailableJobs();
+                console.log('Fetched jobs:', response); // Debugging line
                 const eligibleJobs = response.filter(job => {
                     const requiredCgpa = job.education?.college;
                     const requiredDept = job.department;
@@ -30,6 +31,7 @@ const AvailableJobs = () => {
                         user.student.department === requiredDept
                     );
                 });
+                console.log('Eligible jobs:', eligibleJobs); // Debugging line
                 if (Array.isArray(eligibleJobs)) {
                     setJobs(eligibleJobs);
                     setFilteredJobs(eligibleJobs);
@@ -71,7 +73,7 @@ const AvailableJobs = () => {
 
     // Truncate job description to 60 characters (shorter for compact card)
     const truncateDescription = (desc) => {
-        return desc?.length > 60 ? desc.substring(0, 60) + '...' : desc || '';
+        return desc?.length > 100 ? desc.substring(0, 100) + '...' : desc || '';
     };
 
     // Format date to a readable format (e.g., "30 Jun 2025")
