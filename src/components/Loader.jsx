@@ -20,7 +20,6 @@ const Loader = () => {
     }}>
       {loading ? (
         <>
-          <h2 style={{ marginBottom: '20px' }}>HashLoader</h2>
           <HashLoader color="#624bff" size={70} />
         </>
       ) : (

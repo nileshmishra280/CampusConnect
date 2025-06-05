@@ -1,17 +1,15 @@
-import { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { fetchAvailableJobs } from '../../api/studentApi';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { fetchAvailableJobs, retrieveApplication } from '../../api/studentApi';
+import { toast } from 'react-toastify';
 
-const AvailableJobs = () => {
-    const { user } = useAuth();
-    const navigate = useNavigate();
-    const [jobs, setJobs] = useState([]);
-    const [filteredJobs, setFilteredJobs] = useState([]);
+const AppliedJobs = () => {
+    const { user, setUser } = useAuth();
+    const [appliedJobs, setAppliedJobs] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [selectedJob, setSelectedJob] = useState(null); // Store jobId and prn
+    const [retrieving, setRetrieving] = useState(false);
 
     useEffect(() => {
         const loadJobs = async () => {
@@ -36,49 +34,38 @@ const AvailableJobs = () => {
                 });
                 console.log('Eligible jobs:', eligibleJobs);
 
-                // Step 2: Filter out jobs the user has already applied for
-                const appliedJobIds = user.student.appliedJobs.map(job => job.jobId);
-                const availableJobs = eligibleJobs.filter(job => !appliedJobIds.includes(job._id.toString()));
-
-                console.log('Available jobs after filtering applied jobs:', availableJobs);
-
-                if (Array.isArray(availableJobs)) {
-                    setJobs(availableJobs);
-                    setFilteredJobs(availableJobs);
-                } else {
-                    toast.error('Invalid response from server.', {
-                        position: 'top-right',
-                        autoClose: 3000,
+                // Step 2: Filter applied jobs from eligible jobs
+                const appliedJobIds = user?.student?.appliedJobs?.map(job => job.jobId) || [];
+                const appliedJobsDetails = eligibleJobs
+                    .filter(job => appliedJobIds.includes(job._id.toString()))
+                    .map(job => {
+                        const application = user.student.appliedJobs.find(app => app.jobId === job._id.toString());
+                        return {
+                            ...job,
+                            applicationId: application?._id,
+                            status: application?.status
+                        };
                     });
-                    setJobs([]);
-                    setFilteredJobs([]);
+
+                console.log('Applied jobs with details:', appliedJobsDetails);
+
+                if (Array.isArray(appliedJobsDetails)) {
+                    setAppliedJobs(appliedJobsDetails);
+                } else {
+                    throw new Error('Invalid response format for applied jobs.');
                 }
             } catch (error) {
-                toast.error(error.message || 'Error fetching jobs. Please try again.', {
+                toast.error(error.message || 'Error fetching applied jobs. Please try again.', {
                     position: 'top-right',
                     autoClose: 3000,
                 });
-                setJobs([]);
-                setFilteredJobs([]);
+                setAppliedJobs([]);
             } finally {
                 setIsLoading(false);
             }
         };
         loadJobs();
     }, [user]);
-
-    const handleSearch = (e) => {
-        const term = e.target.value.toLowerCase();
-        setSearchTerm(term);
-        if (term.trim() === '') {
-            setFilteredJobs(jobs);
-        } else {
-            const filtered = jobs.filter((job) =>
-                job.companyId.toLowerCase().includes(term)
-            );
-            setFilteredJobs(filtered);
-        }
-    };
 
     const truncateDescription = (desc) => {
         return desc?.length > 100 ? desc.substring(0, 100) + '...' : desc || '';
@@ -100,28 +87,62 @@ const AvailableJobs = () => {
         return skills?.split('\n').filter(skill => skill.trim()).join(', ') || 'N/A';
     };
 
-    const handleQuickApply = (jobId, jobTitle) => {
-        navigate('/student/quickapply', { state: { jobId, jobTitle } });
+    const handleRetrieveClick = (jobId) => {
+        setSelectedJob({ jobId, prn: user.student.prn });
+        setShowModal(true);
+    };
+
+    const handleConfirmRetrieve = async () => {
+        setRetrieving(true);
+        try {
+            const { prn, jobId } = selectedJob;
+            const response = await retrieveApplication(prn, jobId);
+            if (response.success) {
+                // Update user.student.appliedJobs in AuthContext
+                const updatedAppliedJobs = user.student.appliedJobs.filter(
+                    app => app.jobId !== jobId
+                );
+                setUser({
+                    ...user,
+                    student: {
+                        ...user.student,
+                        appliedJobs: updatedAppliedJobs
+                    }
+                });
+
+                // Update local state
+                setAppliedJobs(appliedJobs.filter(job => job._id !== jobId));
+
+                toast.success('Application retrieved successfully!', {
+                    position: 'top-right',
+                    autoClose: 3000,
+                });
+            } else {
+                throw new Error(response.error || 'Failed to retrieve application.');
+            }
+        } catch (error) {
+            toast.error(error.message || 'Error retrieving application. Please try again.', {
+                position: 'top-right',
+                autoClose: 3000,
+            });
+        } finally {
+            setRetrieving(false);
+            setShowModal(false);
+            setSelectedJob(null);
+        }
+    };
+
+    const handleCancelRetrieve = () => {
+        setShowModal(false);
+        setSelectedJob(null);
     };
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
             <div className="container mx-auto p-4 sm:p-6 lg:p-8">
                 <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">
-                    Available Jobs
+                    Applied Jobs
                 </h2>
-                <div className="mb-6 flex justify-center">
-                    <div className="relative w-full max-w-md">
-                        <i className="ri-search-line absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 text-lg"></i>
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={handleSearch}
-                            placeholder="Search by Company ID (e.g., 2025CSE01)"
-                            className="w-full pl-10 pr-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 border-gray-300 dark:border-gray-600 transition-all duration-300"
-                        />
-                    </div>
-                </div>
                 {isLoading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         {[...Array(6)].map((_, index) => (
@@ -133,13 +154,13 @@ const AvailableJobs = () => {
                             </div>
                         ))}
                     </div>
-                ) : filteredJobs.length === 0 ? (
+                ) : appliedJobs.length === 0 ? (
                     <p className="text-center text-gray-500 dark:text-gray-400">
-                        {searchTerm ? 'No jobs found for this company ID.' : 'No jobs available at the moment.'}
+                        You have not applied for any jobs yet.
                     </p>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {filteredJobs.map((job) => (
+                        {appliedJobs.map((job) => (
                             <div
                                 key={job._id}
                                 className="bg-white dark:bg-gray-800 rounded-lg shadow-lg text-gray-700 dark:text-gray-300 overflow-hidden transform transition duration-300 hover:shadow-xl"
@@ -212,15 +233,22 @@ const AvailableJobs = () => {
                                                 <p className="text-xs">{job.workModel || 'N/A'}</p>
                                             </div>
                                         </div>
+                                        <div className="flex items-start gap-2">
+                                            <i className="ri-check-double-line text-emerald-500 dark:text-emerald-400 text-lg mt-0.5"></i>
+                                            <div>
+                                                <p className="font-semibold text-gray-800 dark:text-gray-100 text-xs">Status:</p>
+                                                <p className="text-xs">{job.status || 'N/A'}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="p-4 pt-0">
                                     <button
-                                        onClick={() => handleQuickApply(job._id, job.jobTitle)}
-                                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white rounded-full transition-colors duration-300"
+                                        onClick={() => handleRetrieveClick(job._id)}
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-full transition-colors duration-300"
                                     >
-                                        <i className="ri-send-plane-line text-base"></i>
-                                        Quick Apply
+                                        <i className="ri-arrow-go-back-line text-base"></i>
+                                        Retrieve Application
                                     </button>
                                 </div>
                             </div>
@@ -228,8 +256,48 @@ const AvailableJobs = () => {
                     </div>
                 )}
             </div>
+
+            {/* Confirmation Modal */}
+            {showModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm">
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
+                            Confirm Retrieval
+                        </h3>
+                        <p className="text-gray-700 dark:text-gray-300 mb-6">
+                            Are you sure you want to retrieve your application? This action cannot be undone.
+                        </p>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={handleCancelRetrieve}
+                                className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors duration-300"
+                                disabled={retrieving}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleConfirmRetrieve}
+                                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-300 flex items-center gap-2"
+                                disabled={retrieving}
+                            >
+                                {retrieving ? (
+                                    <>
+                                        <i className="ri-loader-4-line animate-spin text-base"></i>
+                                        Retrieving...
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="ri-arrow-go-back-line text-base"></i>
+                                        Retrieve
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
-export default AvailableJobs;
+export default AppliedJobs;

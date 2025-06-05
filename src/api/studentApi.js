@@ -54,6 +54,39 @@ export const fetchInterviewQuestions = async (resumeUrl, numQuestions) => {
   }
 };
 
+export const applyForJob = async (applicationData) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/student/applyForJob`, applicationData, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error applying for job:', error);
+        throw error.response ? error.response.data : error;
+    }
+}
+
+export const retrieveApplication = async (prn, jobId) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/student/retrieveApplication`, {
+            prn,
+            jobId
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error retrieving application:', error);
+        throw error.response ? error.response.data : error;
+    }
+}
+
+
+
 // export const fetchJobs = async (token) => {
 //   try {
 //     const response = await axios.get(`${API_BASE_URL}/company/jobs`, {

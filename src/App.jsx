@@ -11,6 +11,7 @@ import StudentProfile from './pages/student/StudentProfile';
 import CompanyDashboard from './pages/company/CompanyDashboard';
 import JobInfo from './pages/JobInfo';
 import Loader from './components/Loader';
+import QuickApply from './pages/student/QuickApply';
 
 const App = () => {
   return <AppRoutes />;
@@ -38,6 +39,7 @@ const AppRoutes = () => {
           <Route path="/company/dashboard" element={<CompanyDashboard />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/student/profile" element={<StudentProfile />} />
+          <Route path="/student/quickapply" element={<QuickApply />} />
           <Route path="/jobInfo" element={<JobInfo />} />
         </Route>
       </Routes>

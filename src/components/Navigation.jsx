@@ -374,7 +374,7 @@ const Navigation = ({ role }) => {
                   </h1>
                   {/* To center instead, replace pl-4 with text-center */}
                   {/* <h1 className="text-lg sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 truncate text-center"> */}
-                  <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mt-1.5">
+                  <div className="hidden ml-6 sm:flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mt-1.5">
                     {breadcrumbs.map((crumb, index) => (
                       <div key={crumb.href} className="flex items-center">
                         <Link
