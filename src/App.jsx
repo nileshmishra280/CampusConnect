@@ -11,6 +11,7 @@ import StudentProfile from './pages/student/StudentProfile';
 import CompanyDashboard from './pages/company/CompanyDashboard';
 import JobInfo from './pages/JobInfo';
 import Loader from './components/Loader';
+import ReviewApplications from './pages/company/ReviewApplications';
 
 const App = () => {
   return <AppRoutes />;
@@ -36,6 +37,7 @@ const AppRoutes = () => {
         <Route element={<Navigation role={userType} />}>
           <Route path="/student/dashboard" element={<StudentDashboard />} />
           <Route path="/company/dashboard" element={<CompanyDashboard />} />
+          <Route path="/company/applications/review" element={<ReviewApplications />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/student/profile" element={<StudentProfile />} />
           <Route path="/jobInfo" element={<JobInfo />} />

@@ -20,3 +20,14 @@ export const addCompanydetails = async (formData) => {
         throw error.response ? error.response.data : { message: 'Network error', success: false };
     }
 };
+
+
+export const fetchAvailableJobs = async (companyId) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/company/getCreatedJobs?companyId=${companyId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching available jobs:', error);
+        throw error.response ? error.response.data : error;
+    }
+}
