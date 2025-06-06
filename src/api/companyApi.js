@@ -31,3 +31,13 @@ export const fetchAvailableJobs = async (companyId) => {
         throw error.response ? error.response.data : error;
     }
 }
+
+export const getAllAppliedStudents = async (jobId) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/company/interestedStudents?jobId=${jobId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching available jobs:', error);
+        throw error.response ? error.response.data : error;
+    }
+}

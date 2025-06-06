@@ -11,6 +11,9 @@ import StudentProfile from './pages/student/StudentProfile';
 import CompanyDashboard from './pages/company/CompanyDashboard';
 import JobInfo from './pages/JobInfo';
 import Loader from './components/Loader';
+import ReviewApplications from './pages/company/ReviewApplications';
+import QuickApply from './pages/student/QuickApply';
+import Applicants from './pages/company/Applicants';
 
 const App = () => {
   return <AppRoutes />;
@@ -41,6 +44,7 @@ const AppRoutes = () => {
           <Route path="/student/profile" element={<StudentProfile />} />
           <Route path="/student/quickapply" element={<QuickApply />} />
           <Route path="/jobInfo" element={<JobInfo />} />
+          <Route path='/company/applicants' element={<Applicants/>}/>
         </Route>
       </Routes>
     </Router>

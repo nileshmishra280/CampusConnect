@@ -1,10 +1,14 @@
 import { useState, useEffect, use } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { fetchAvailableJobs } from '../../api/companyApi';
+import { fetchAvailableJobs, getAllAppliedStudents } from '../../api/companyApi';
 import { useAuth } from '../../context/AuthContext';
+import Applicants from './Applicants';
+import { useNavigate } from 'react-router-dom';
+
 
 const ReviewApplications = () => {
+    const navigate = useNavigate();
     const { user } = useAuth();
     const [jobs, setJobs] = useState([]);
     const [filteredJobs, setFilteredJobs] = useState([]);
@@ -82,12 +86,10 @@ const ReviewApplications = () => {
         return skills?.split('\n').filter(skill => skill.trim()).join(', ') || 'N/A';
     };
 
-    // Handle Quick Apply button click
-    const handleQuickApply = (jobTitle) => {
-        toast.success(`Quick Apply submitted for ${jobTitle}!`, {
-            position: 'top-right',
-            autoClose: 3000,
-        });
+    const getStudents = async (jobId) => {
+        const res=await getAllAppliedStudents(jobId);
+        console.log(res);
+        navigate('/company/applicants', { state: { res } });
     };
 
     return (
@@ -208,11 +210,9 @@ const ReviewApplications = () => {
                                     </div>
                                 </div>
 
-                                {/* Quick Apply Button */}
                                 <div className="p-4 pt-0">
                                     <button
-                                        disabled={new Date(job.lastDateForApplication) > new Date()}
-                                        onClick={() => handleQuickApply(job.jobTitle)}
+                                        onClick={() => getStudents(job._id)}
                                         className={`w-full flex items-center justify-center gap-2 px-4 py-1.5 
     ${new Date(job.lastDateForApplication) > new Date()
                                                 ? "bg-gray-400 cursor-not-allowed"
