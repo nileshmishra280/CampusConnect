@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import UploadMarksheet from './UploadMarksheet';
 import AvailableJobs from './AvailableJobs';
 import QuesFromResume from './QuesFromResume';
+import AppliedJobs from './AppliedJobs';
+
 
 
 const StudentDashboard = () => {
@@ -28,6 +30,8 @@ const StudentDashboard = () => {
         <AvailableJobs />
       </div>
 
+        <AppliedJobs/>
+
       {/* Modal-style overlay for uploading */}
       {!hasUploadedDetails && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
@@ -36,6 +40,8 @@ const StudentDashboard = () => {
           </div>
         </div>
       )}
+
+      
 
       <QuesFromResume />
     </div>

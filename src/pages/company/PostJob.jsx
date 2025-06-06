@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { toast , ToastContainer} from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { postJob } from "../../api/companyApi";
 import { useAuth } from "../../context/AuthContext";
@@ -101,7 +101,6 @@ const PostJob = () => {
 
     setIsSubmitting(true);
     try {
-        
       const response = await postJob(jobData);
     
       if (response.success) {
@@ -144,7 +143,7 @@ const PostJob = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg mt-4">
-        <ToastContainer />
+      <ToastContainer />
       <section className="divide-y divide-gray-200 dark:divide-gray-700">
         {/* Job Title */}
         <details className="p-4 group" open>
@@ -444,15 +443,19 @@ const PostJob = () => {
               {errors.CTC && <p className="text-red-500 text-sm mt-1">{errors.CTC}</p>}
             </div>
             <div>
-              <input
-                type="text"
+              <select
                 value={jobData.department}
                 onChange={(e) => handleInputChange(e, "department")}
-                placeholder="Department (e.g., Engineering)"
                 className={`w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                   errors.department ? "border-red-500" : "border-gray-300 dark:border-gray-600"
                 }`}
-              />
+              >
+                <option value="">Select Department</option>
+                <option value="CSE">CSE</option>
+                <option value="ME">ME</option>
+                <option value="EE">EE</option>
+                <option value="TE">TE</option>
+              </select>
               {errors.department && (
                 <p className="text-red-500 text-sm mt-1">{errors.department}</p>
               )}
@@ -470,7 +473,7 @@ const PostJob = () => {
               {errors.bond && <p className="text-red-500 text-sm mt-1">{errors.bond}</p>}
             </div>
             <div>
-               <h5 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Last Date to Apply</h5>
+              <h5 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Last Date to Apply</h5>
               <input
                 type="date"
                 value={jobData.lastDateForApplication}
