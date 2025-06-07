@@ -97,6 +97,7 @@ const Navigation = ({ role }) => {
       {
         name: 'Applications', href: '/company/applications', icon: 'ri-file-list-2-line', subItems: [
           { name: 'Review Applications', href: '/company/applications/review' },
+          { name: 'Select Applicants', href: '/company/applications/select' },
           { name: 'Shortlisted', href: '/company/applications/shortlisted' },
           { name: 'Rejected', href: '/company/applications/rejected' },
         ]

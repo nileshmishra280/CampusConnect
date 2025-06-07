@@ -1,10 +1,14 @@
 import React from 'react'
 import { useLocation } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
 const Applicants = () => {
     const location = useLocation();
     const students = location.state?.res || [];
-    console.log(students);
+    const navigate=useNavigate();
+    const handleViewMore=(student)=>{
+        navigate('/company/applicantDetails',{state:{student}})
+    }
+
     return (
         <div>
             <section class="bg-white py-12">
@@ -22,7 +26,7 @@ const Applicants = () => {
                                         <p className="text-sm text-gray-500">PRN: {student.prn}</p>
                                     </div>
                                 </div>
-                                <button className="mt-4 w-full px-4 py-2 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-700">
+                                <button onClick={()=>handleViewMore(student)} className="mt-4 w-full px-4 py-2 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-700">
                                     View More
                                 </button>
                             </div>

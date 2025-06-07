@@ -14,6 +14,9 @@ import Loader from './components/Loader';
 import ReviewApplications from './pages/company/ReviewApplications';
 import QuickApply from './pages/student/QuickApply';
 import Applicants from './pages/company/Applicants';
+import StudentDetails from './pages/company/StudentDetails';
+import SelectJob from './pages/company/SelectJob';
+import SelectApplicants from './pages/company/SelectApplicants';
 
 const App = () => {
   return <AppRoutes />;
@@ -40,11 +43,16 @@ const AppRoutes = () => {
           <Route path="/student/dashboard" element={<StudentDashboard />} />
           <Route path="/company/dashboard" element={<CompanyDashboard />} />
           <Route path="/company/applications/review" element={<ReviewApplications />} />
+          <Route path="/company/applications/select" element={<SelectJob />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/student/profile" element={<StudentProfile />} />
           <Route path="/student/quickapply" element={<QuickApply />} />
           <Route path="/jobInfo" element={<JobInfo />} />
           <Route path='/company/applicants' element={<Applicants/>}/>
+          <Route path='/company/applicantDetails' element={<StudentDetails/>}/>
+          <Route path='/company/selectApplicants' element={<SelectApplicants/>}/>
+          
+          
         </Route>
       </Routes>
     </Router>
