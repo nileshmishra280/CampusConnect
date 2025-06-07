@@ -85,16 +85,18 @@ export const retrieveApplication = async (prn, jobId) => {
     }
 }
 
+export const updateProfile = async (formData) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/student/updateProfile`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
 
 
-// export const fetchJobs = async (token) => {
-//   try {
-//     const response = await axios.get(`${API_BASE_URL}/company/jobs`, {
-//       headers: { Authorization: `Bearer ${token}` },
-//     });
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error fetching jobs:', error);
-//     throw error.response ? error.response.data : { message: 'Network error', success: false };
-//   }
-// };

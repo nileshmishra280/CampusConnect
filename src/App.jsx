@@ -39,11 +39,14 @@ const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
 
+
         <Route element={<Navigation role={userType} />}>
           <Route path="/student/dashboard" element={<StudentDashboard />} />
           <Route path="/company/dashboard" element={<CompanyDashboard />} />
+
           <Route path="/company/applications/review" element={<ReviewApplications />} />
           <Route path="/company/applications/select" element={<SelectJob />} />
+          
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/student/profile" element={<StudentProfile />} />
           <Route path="/student/quickapply" element={<QuickApply />} />
