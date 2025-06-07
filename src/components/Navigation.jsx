@@ -38,9 +38,7 @@ const Navigation = ({ role }) => {
       { name: 'Dashboard', href: '/student/dashboard', icon: 'ri-dashboard-line', subItems: [] },
       {
         name: 'Applications', href: '/student/applications', icon: 'ri-file-text-line', subItems: [
-          { name: 'Pending', href: '/student/applications/pending' },
-          { name: 'Submitted', href: '/student/applications/submitted' },
-          { name: 'History', href: '/student/applications/history' },
+          
         ]
       },
       { name: 'Resume Builder', href: '/student/resume', icon: 'ri-file-user-line', subItems: [] },

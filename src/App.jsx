@@ -17,6 +17,8 @@ import Applicants from './pages/company/Applicants';
 import StudentDetails from './pages/company/StudentDetails';
 import SelectJob from './pages/company/SelectJob';
 import SelectApplicants from './pages/company/SelectApplicants';
+import Applications from './pages/student/Applications';
+import JobDetails from './pages/student/JobDetails';
 
 const App = () => {
   return <AppRoutes />;
@@ -48,13 +50,14 @@ const AppRoutes = () => {
           <Route path="/company/applications/select" element={<SelectJob />} />
           
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/student/applications" element={<Applications />} />
           <Route path="/student/profile" element={<StudentProfile />} />
           <Route path="/student/quickapply" element={<QuickApply />} />
           <Route path="/jobInfo" element={<JobInfo />} />
           <Route path='/company/applicants' element={<Applicants/>}/>
           <Route path='/company/applicantDetails' element={<StudentDetails/>}/>
           <Route path='/company/selectApplicants' element={<SelectApplicants/>}/>
-          
+          <Route path='/student/applications/jobDetails' element={<JobDetails/>}/>          
           
         </Route>
       </Routes>

@@ -99,4 +99,11 @@ export const updateProfile = async (formData) => {
   }
 };
 
-
+export const fetchJobs = async (prn) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/student/getJobs?prn=${prn}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch questions');
+  }
+};
