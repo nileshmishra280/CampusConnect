@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CarouselTestimonial from './CarouselTestimonial';
 import CarouselLogo from './CarouselLogo';
+import { useAuth } from '../context/AuthContext';
 
 // Features for the recruitment system
 const features = [
@@ -14,9 +15,19 @@ const features = [
 ];
 
 const LandingPage = () => {
+  const { user, userType } = useAuth();
   const [theme, setTheme] = useState('dark');
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+
+
+  useEffect(() => {
+    if (user) {
+      if (userType === 'student') navigate('/student/dashboard');
+      else if (userType === 'company') navigate('/company/dashboard');
+      else if (userType === 'admin') navigate('/admin/dashboard');
+    }
+  }, [user, userType, navigate]);
 
   // Theme toggle
   const toggleTheme = () => {
@@ -136,53 +147,52 @@ const LandingPage = () => {
 
         {/* Hero Section */}
         <section className="px-4 py-1">
-  <div className="container mx-auto flex flex-col items-center md:flex-row">
-    {/* Text Section */}
-    <div className="mb-10 md:mb-0 md:w-1/2">
-      <h1 className="mb-6 text-4xl font-bold md:text-5xl">
-        Streamline Your Career with <span className="text-purple-500">CampusConnect</span>
-      </h1>
-      <p className="mb-8 text-lg opacity-90">
-        A centralized platform for students, companies, and admins to simplify campus recruitment with automated verification and one-click applications.
-      </p>
-      <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
-        <a
-          href="/login"
-          className="rounded-lg bg-purple-600 px-8 py-3 text-center text-white transition-colors hover:bg-purple-700"
-        >
-          Get Started Now
-        </a>
-        <a
-          href="#how-it-works"
-          className="rounded-lg border border-purple-600 px-8 py-3 text-center text-purple-600 transition-colors hover:bg-purple-100 dark:hover:bg-purple-900"
-        >
-          How It Works
-        </a>
-      </div>
-    </div>
+          <div className="container mx-auto flex flex-col items-center md:flex-row">
+            {/* Text Section */}
+            <div className="mb-10 md:mb-0 md:w-1/2">
+              <h1 className="mb-6 text-4xl font-bold md:text-5xl">
+                Streamline Your Career with <span className="text-purple-500">CampusConnect</span>
+              </h1>
+              <p className="mb-8 text-lg opacity-90">
+                A centralized platform for students, companies, and admins to simplify campus recruitment with automated verification and one-click applications.
+              </p>
+              <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+                <a
+                  href="/login"
+                  className="rounded-lg bg-purple-600 px-8 py-3 text-center text-white transition-colors hover:bg-purple-700"
+                >
+                  Get Started Now
+                </a>
+                <a
+                  href="#how-it-works"
+                  className="rounded-lg border border-purple-600 px-8 py-3 text-center text-purple-600 transition-colors hover:bg-purple-100 dark:hover:bg-purple-900"
+                >
+                  How It Works
+                </a>
+              </div>
+            </div>
 
-    {/* Image Section */}
-    <div className="md:w-1/2 w-full">
-      <div
-        className={`relative overflow-hidden rounded-2xl shadow-2xl h-[400px] md:h-[500px] ${
-          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-        }`}
-      >
-        <img
-          src="../landing-bg.jpg"
-          alt="Recruitment Platform Interface"
-          className="w-full h-full object-cover"
-          onError={() => console.log('Image failed to load')}
-        />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent p-6">
-          <p className="text-lg font-semibold text-white">
-            Ready to kickstart your career?
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+            {/* Image Section */}
+            <div className="md:w-1/2 w-full">
+              <div
+                className={`relative overflow-hidden rounded-2xl shadow-2xl h-[400px] md:h-[500px] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+                  }`}
+              >
+                <img
+                  src="../landing-bg.jpg"
+                  alt="Recruitment Platform Interface"
+                  className="w-full h-full object-cover"
+                  onError={() => console.log('Image failed to load')}
+                />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent p-6">
+                  <p className="text-lg font-semibold text-white">
+                    Ready to kickstart your career?
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
 
         {/* Stats Section */}
