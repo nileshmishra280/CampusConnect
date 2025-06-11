@@ -56,11 +56,11 @@ export const fetchInterviewQuestions = async (resumeUrl, numQuestions) => {
   }
 };
 
-export const applyForJob = async (applicationData) => {
+export const applyForJob = async (formData) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/student/applyForJob`, applicationData, {
+        const response = await axios.post(`${API_BASE_URL}/student/applyForJob`, formData, {
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'multipart/form-data',
             },
         });
         return response.data;
@@ -68,7 +68,7 @@ export const applyForJob = async (applicationData) => {
         console.error('Error applying for job:', error);
         throw error.response ? error.response.data : error;
     }
-}
+};
 
 export const retrieveApplication = async (prn, jobId) => {
     try {

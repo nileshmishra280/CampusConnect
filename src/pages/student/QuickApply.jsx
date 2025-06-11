@@ -11,6 +11,20 @@ const QuickApply = () => {
     const navigate = useNavigate();
     const { jobId, jobTitle } = location.state || {};
     const [loading, setLoading] = useState(false);
+    const [resumeFile, setResumeFile] = useState(null);
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file && (file.type === 'application/pdf' || file.type === 'image/jpeg')) {
+            setResumeFile(file);
+        } else {
+            toast.error('Please upload a valid PDF or JPG file.', {
+                position: "top-right",
+                autoClose: 3000,
+            });
+            setResumeFile(null);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -34,17 +48,19 @@ const QuickApply = () => {
             return;
         }
 
-        const applicationData = {
-            prn: user.student.prn,
-            email: user.student.email,
-            jobId,
-            resume: user.student.resume || ''
-        };
+        const formData = new FormData();
+        formData.append('prn', user.student.prn);
+        formData.append('email', user.student.email);
+        formData.append('jobId', jobId);
+        if (resumeFile) {
+            formData.append('resume', resumeFile);
+        } else {
+            formData.append('resumeUrl', user.student.resume || '');
+        }
 
         try {
-            const response = await applyForJob(applicationData);
+            const response = await applyForJob(formData);
             if (response.success) {
-                // Update user context with new application
                 setUser({
                     ...user,
                     student: {
@@ -138,7 +154,7 @@ const QuickApply = () => {
                         </div>
                     </div>
                     <div className="group">
-                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Resume URL</label>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Current Resume</label>
                         <div className="w-full flex items-center border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50/80 dark:bg-gray-700/80 text-gray-800 dark:text-gray-200 px-3 py-2 text-sm">
                             <FileIcon />
                             {user?.student?.resume ? (
@@ -156,9 +172,18 @@ const QuickApply = () => {
                             )}
                         </div>
                     </div>
+                    <div className="group">
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Upload New Resume (Optional, PDF or JPG)</label>
+                        <input
+                            type="file"
+                            accept="application/pdf,image/jpeg"
+                            onChange={handleFileChange}
+                            className="w-full text-sm text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-teal-600 file:text-white hover:file:bg-teal-700 transition-all duration-300"
+                        />
+                    </div>
                     <button
                         type="submit"
-                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r  from-green-700 to-green-400 hover:from-green-600 hover:to-green-900 text-white rounded-lg transition-all duration-300 text-sm font-medium shadow-md hover:shadow-lg group disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-green-700 to-green-400 hover:from-green-600 hover:to-green-900 text-white rounded-lg transition-all duration-300 text-sm font-medium shadow-md hover:shadow-lg group disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled={loading}
                     >
                         {loading ? (

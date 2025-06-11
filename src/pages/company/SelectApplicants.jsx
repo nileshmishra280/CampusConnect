@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, Typography } from "@material-tailwind/react";
 import { selectApplicants } from '../../api/companyApi';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SelectApplicants = () => {
   const location = useLocation();
@@ -23,14 +25,33 @@ const SelectApplicants = () => {
   const handleSubmit = async () => {
     try {
       const response = await selectApplicants(jobId, selectedPRNs);
-      console.log('Server response:', response);
+      if (response.success) {
+        toast.success('Applicants selected successfully!', {
+          position: "top-right",
+          autoClose: 3000,
+          onClose: () => {
+            setSelectedPRNs([]);
+            navigate('/company/dashboard');
+          },
+        });
+      } else {
+        toast.error(response.message || 'Failed to select applicants.', {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
     } catch (error) {
       console.error('Error submitting:', error);
+      toast.error(error.message || 'Something went wrong while selecting applicants.', {
+        position: "top-right",
+        autoClose: 3000,
+      });
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-900 dark:to-indigo-950 p-4 sm:p-6 md:p-8 transition-all duration-500">
+      <ToastContainer />
       <div className="w-full max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="mb-8 text-center">
