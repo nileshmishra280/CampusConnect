@@ -47,12 +47,11 @@ const Navigation = ({ role }) => {
           
         ]
       },
-      { name: 'Resume Builder', href: '/student/resume', icon: 'ri-file-user-line', subItems: [] },
+      { name: 'Interview Questions', href: '/student/resumeQuestions', icon: 'ri-file-user-line', subItems: [] },
       { name: 'Placement Form', href: '/student/placement-form', icon: 'ri-clipboard-line', subItems: [] },
       {
-        name: 'Job Applications', href: '/student/apply-jobs', icon: 'ri-briefcase-line', subItems: [
+        name: 'Job Applications', icon: 'ri-briefcase-line', subItems: [
           { name: 'Browse Jobs', href: '/student/apply-jobs/browse' },
-          { name: 'Saved Jobs', href: '/student/apply-jobs/saved' },
           { name: 'Applied Jobs', href: '/student/apply-jobs/applied' },
         ]
       },
