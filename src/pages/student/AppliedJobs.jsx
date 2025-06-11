@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { fetchAvailableJobs, retrieveApplication } from '../../api/studentApi';
+import { fetchApplicationDetails, fetchAvailableJobs, retrieveApplication } from '../../api/studentApi';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const AppliedJobs = () => {
     const { user, setUser } = useAuth();
@@ -10,7 +11,7 @@ const AppliedJobs = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedJob, setSelectedJob] = useState(null);
     const [retrieving, setRetrieving] = useState(false);
-
+    const navigate=useNavigate();
     useEffect(() => {
         const loadJobs = async () => {
             setIsLoading(true);
@@ -96,6 +97,12 @@ const AppliedJobs = () => {
         setSelectedJob({ jobId, prn: user.student.prn });
         setShowModal(true);
     };
+
+
+    const handleViewApplication=async (jobId)=>{
+        const student=await fetchApplicationDetails(user.student.prn,jobId);
+        navigate('/student/applicationDetails',{state:{student}});
+    }
 
     const handleConfirmRetrieve = async () => {
         setRetrieving(true);
@@ -317,6 +324,16 @@ const AppliedJobs = () => {
                                                 </div>
                                             </div>
                                         </div>
+                                        <button
+                                            onClick={() => handleViewApplication(job._id)}
+                                            className={`w-full my-3 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-md hover:shadow-lg'
+                                            `}
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
+                                            </svg>
+                                            View application details
+                                        </button>
                                         <button
                                             onClick={() => handleRetrieveClick(job._id)}
                                             className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${

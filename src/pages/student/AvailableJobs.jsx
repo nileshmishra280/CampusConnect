@@ -114,8 +114,12 @@ const AvailableJobs = () => {
         }
     };
 
-    const handleQuickApply = (jobId, jobTitle) => {
-        navigate('/student/quickapply', { state: { jobId, jobTitle } });
+    const handleViewDetails = (job) => {
+        const validJob = {
+      ...job,
+      status: job.status || 'Pending',
+    };
+    navigate('/student/vewDetailsForApplication', { state: validJob });
     };
 
     const SearchIcon = () => (
@@ -317,11 +321,11 @@ const AvailableJobs = () => {
                                         </div>
                                     </div>
                                     <button
-                                        onClick={() => handleQuickApply(job._id, job.jobTitle)}
+                                        onClick={() => handleViewDetails(job)}
                                         className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm bg-gradient-to-r from-green-700 to-green-400 hover:from-green-600 hover:to-green-900 text-white shadow-md hover:shadow-lg transition-all duration-300 group"
                                     >
                                         <SendIcon />
-                                        Quick Apply
+                                        View more details
                                     </button>
                                 </div>
                             </div>

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 
 const Navigation = ({ role }) => {
-  const { user } = useAuth();
+  const { user,logout } = useAuth();
+  const navigate=useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default closed on mobile
   const [sidebarWidth, setSidebarWidth] = useState(256);
   const [isResizing, setIsResizing] = useState(false);
@@ -32,6 +33,11 @@ const Navigation = ({ role }) => {
     role = 'student';
   }
 
+  const handleLogOut=()=>{
+    logout();
+    navigate('/');
+  }
+
   // Role-based sidebar items with Remix Icons
   const defaultNavItems = {
     student: [
@@ -41,12 +47,11 @@ const Navigation = ({ role }) => {
           
         ]
       },
-      { name: 'Resume Builder', href: '/student/resume', icon: 'ri-file-user-line', subItems: [] },
+      { name: 'Interview Questions', href: '/student/resumeQuestions', icon: 'ri-file-user-line', subItems: [] },
       { name: 'Placement Form', href: '/student/placement-form', icon: 'ri-clipboard-line', subItems: [] },
       {
-        name: 'Job Applications', href: '/student/apply-jobs', icon: 'ri-briefcase-line', subItems: [
+        name: 'Job Applications', icon: 'ri-briefcase-line', subItems: [
           { name: 'Browse Jobs', href: '/student/apply-jobs/browse' },
-          { name: 'Saved Jobs', href: '/student/apply-jobs/saved' },
           { name: 'Applied Jobs', href: '/student/apply-jobs/applied' },
         ]
       },
@@ -472,7 +477,7 @@ const Navigation = ({ role }) => {
                           ? user.company?.companyProfile || 'https://via.placeholder.com/150'
                           : role === 'student'
                             ? user.student?.profilePhoto || 'https://via.placeholder.com/150'
-                            : 'https://via.placeholder.com/150'
+                            : user.profilePhoto?user.profilePhoto: 'https://via.placeholder.com/150'
                       }
                       alt="User avatar"
                       className="h-8 w-8 sm:h-9 sm:w-9 rounded-full border-2 border-white dark:border-gray-700 shadow-md hover:scale-105 transition-transform duration-200"
@@ -490,7 +495,7 @@ const Navigation = ({ role }) => {
                       </Link>
 
                       <hr className="border-gray-200/50 dark:border-gray-700/50" />
-                      <button className="flex items-center gap-3 w-full text-left px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/20 transition-colors duration-200">
+                      <button className="flex items-center gap-3 w-full text-left px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/20 transition-colors duration-200" onClick={handleLogOut}>
                         <i className="ri-logout-box-line text-lg"></i>
                         <span className="font-medium">Logout</span>
                       </button>

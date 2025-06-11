@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
         userData = await fetchCompanyData();
       } else if (role === 'admin') {
         // Admin data fetch can be added if needed
-        userData = { role: 'admin' }; // Placeholder for admin data
+        userData = { role: 'admin',profilePhoto:'https://upload.wikimedia.org/wikipedia/en/b/bf/Msu_baroda_logo.png' }; // Placeholder for admin data
       }
       setUser(userData);
     } catch (err) {
