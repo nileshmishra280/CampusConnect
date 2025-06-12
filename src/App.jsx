@@ -24,6 +24,9 @@ import QuesFromResume from './pages/student/QuesFromResume';
 import AvailableJobs from './pages/student/AvailableJobs';
 import AppliedJobs from './pages/student/AppliedJobs';
 import ApplicationDetails from './pages/student/ApplicationDetails';
+import SelectedStudents from './pages/company/SelectedStudents';
+import AllocatedJobs from './pages/company/AllocatedJobs';
+import RejectedStudents from './pages/company/RejectedStudents';
 
 const App = () => {
   return <AppRoutes />;
@@ -53,7 +56,8 @@ const AppRoutes = () => {
 
           <Route path="/company/applications/review" element={<ReviewApplications />} />
           <Route path="/company/applications/select" element={<SelectJob />} />
-          
+          <Route path="/company/applications/shortlisted" element={<AllocatedJobs />} />
+
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/student/applications" element={<Applications />} />
           <Route path="/student/profile" element={<StudentProfile />} />
@@ -62,14 +66,17 @@ const AppRoutes = () => {
           <Route path="/student/apply-jobs/browse" element={<AvailableJobs />} />
           <Route path="/student/apply-jobs/applied" element={<AppliedJobs />} />
           <Route path="/student/applicationDetails" element={<ApplicationDetails />} />
-          
+
 
           <Route path="/jobInfo" element={<JobInfo />} />
-          <Route path='/company/applicants' element={<Applicants/>}/>
-          <Route path='/company/applicantDetails' element={<StudentDetails/>}/>
-          <Route path='/company/selectApplicants' element={<SelectApplicants/>}/>
-          <Route path='/student/applications/jobDetails' element={<JobDetails/>}/>          
-          <Route path='/student/vewDetailsForApplication' element={<JobDetailsForApplication/>}/>      
+          <Route path='/company/applicants' element={<Applicants />} />
+          <Route path='/company/applicantDetails' element={<StudentDetails />} />
+          <Route path='/company/selectApplicants' element={<SelectApplicants />} />
+          <Route path='/company/selectedStudents' element={<SelectedStudents />} />
+          <Route path='/company/rejectedStudents' element={<RejectedStudents />} />
+
+          <Route path='/student/applications/jobDetails' element={<JobDetails />} />
+          <Route path='/student/vewDetailsForApplication' element={<JobDetailsForApplication />} />
         </Route>
       </Routes>
     </Router>

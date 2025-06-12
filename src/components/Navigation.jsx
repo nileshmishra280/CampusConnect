@@ -91,14 +91,14 @@ const Navigation = ({ role }) => {
     company: [
       { name: 'Dashboard', href: '/company/dashboard', icon: 'ri-dashboard-line', subItems: [] },
       {
-        name: 'Job Postings', href: '/company/jobs', icon: 'ri-briefcase-2-line', subItems: [
+        name: 'Job Postings', icon: 'ri-briefcase-2-line', subItems: [
           { name: 'Create Job', href: '/company/jobs/create' },
           { name: 'Active Jobs', href: '/company/jobs/active' },
           { name: 'Closed Jobs', href: '/company/jobs/closed' },
         ]
       },
       {
-        name: 'Applications', href: '/company/applications', icon: 'ri-file-list-2-line', subItems: [
+        name: 'Applications', icon: 'ri-file-list-2-line', subItems: [
           { name: 'Review Applications', href: '/company/applications/review' },
           { name: 'Select Applicants', href: '/company/applications/select' },
           { name: 'Shortlisted', href: '/company/applications/shortlisted' },

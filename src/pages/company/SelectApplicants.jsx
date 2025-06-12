@@ -24,6 +24,7 @@ const SelectApplicants = () => {
     try {
       const response = await selectApplicants(jobId, selectedPRNs);
       console.log('Server response:', response);
+      navigate(`/company/selectedStudents?jobId=${jobId}`);
     } catch (error) {
       console.error('Error submitting:', error);
     }
