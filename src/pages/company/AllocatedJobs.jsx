@@ -222,7 +222,7 @@ const AllocatedJobs = () => {
 
                                     <button
                                         onClick={() => getRejectedStudents(job._id)}
-                                        className={`w-full flex items-center justify-center gap-2 px-4 py-1.5 bg-red-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 cursor-pointer text-white rounded-lg transition-colors duration-300 text-sm`}
+                                        className={`w-full flex items-center justify-center gap-2 px-4 py-1.5 bg-red-500 hover:bg-red-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 cursor-pointer text-white rounded-lg transition-colors duration-300 text-sm`}
                                     >
                                         <i className="ri-send-plane-line text-base"></i>
                                         Get Rejected Student Details

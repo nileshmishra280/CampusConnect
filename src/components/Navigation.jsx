@@ -94,15 +94,13 @@ const Navigation = ({ role }) => {
         name: 'Job Postings', icon: 'ri-briefcase-2-line', subItems: [
           { name: 'Create Job', href: '/company/jobs/create' },
           { name: 'Active Jobs', href: '/company/jobs/active' },
-          { name: 'Closed Jobs', href: '/company/jobs/closed' },
+          { name: 'Closed Jobs', href: '/company/applications/shortlisted' },
         ]
       },
       {
         name: 'Applications', icon: 'ri-file-list-2-line', subItems: [
           { name: 'Review Applications', href: '/company/applications/review' },
           { name: 'Select Applicants', href: '/company/applications/select' },
-          { name: 'Shortlisted', href: '/company/applications/shortlisted' },
-          { name: 'Rejected', href: '/company/applications/rejected' },
         ]
       },
       {
@@ -112,7 +110,6 @@ const Navigation = ({ role }) => {
           { name: 'Past Interviews', href: '/company/interviews/past' },
         ]
       },
-      { name: 'Analytics', href: '/company/analytics', icon: 'ri-bar-chart-line', subItems: [] },
       { name: 'Company Profile', href: '/company/profile', icon: 'ri-building-2-line', subItems: [] },
     ],
   };
@@ -487,7 +484,9 @@ const Navigation = ({ role }) => {
                   {isProfileOpen && (
                     <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden animate-slideDown">
                       <Link
-                        to="student/profile"
+                        to={
+                          role==='company'? "/company/profile" : role==='student'? "/student/profile" : "/admin/profile"
+                        }
                         className="flex items-center gap-3 px-4 py-3 text-gray-800 dark:text-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-colors duration-200"
                       >
                         <i className="ri-user-line text-lg"></i>
