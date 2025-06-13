@@ -1,13 +1,12 @@
 import { useState, useEffect, use } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { fetchAllJobs, fetchAvailableJobs, getAllAppliedStudents } from '../../api/companyApi';
+import { allocatedJobs } from '../../api/companyApi';
 import { useAuth } from '../../context/AuthContext';
-import Applicants from './Applicants';
 import { useNavigate } from 'react-router-dom';
 
 
-const ReviewApplications = () => {
+const AllocatedJobs = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [jobs, setJobs] = useState([]);
@@ -18,10 +17,9 @@ const ReviewApplications = () => {
     useEffect(() => {
         const loadJobs = async () => {
             setIsLoading(true);
-            // Introduce a 1-second delay before starting the fetch
             await new Promise((resolve) => setTimeout(resolve, 1000));
             try {
-                const response = await fetchAvailableJobs(user.company.companyId);
+                const response = await allocatedJobs(user.company.companyId);
                 console.log('Fetched jobs:', response); // Debugging line
 
                 if (Array.isArray(response)) {
@@ -86,10 +84,12 @@ const ReviewApplications = () => {
         return skills?.split('\n').filter(skill => skill.trim()).join(', ') || 'N/A';
     };
 
-    const getStudents = async (jobId) => {
-        const res=await getAllAppliedStudents(jobId);
-        console.log(res);
-        navigate('/company/applicants', { state: { res } });
+    const getSelectedStudents = async (jobId) => {
+        navigate(`/company/selectedStudents?jobId=${jobId}`);
+    };
+
+    const getRejectedStudents = async (jobId) => {
+        navigate(`/company/rejectedStudents?jobId=${jobId}`);
     };
 
     return (
@@ -97,7 +97,7 @@ const ReviewApplications = () => {
             <div className="container mx-auto p-4 sm:p-6 lg:p-8">
                 {/* Title */}
                 <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">
-                    Created Jobs
+                    Allocated Jobs
                 </h2>
 
                 {/* Search Bar */}
@@ -212,16 +212,20 @@ const ReviewApplications = () => {
 
                                 <div className="p-4 pt-0">
                                     <button
-                                        onClick={() => getStudents(job._id)}
-                                        className={`w-full flex items-center justify-center gap-2 px-4 py-1.5 
-    ${new Date(job.lastDateForApplication) > new Date()
-                                                ? "bg-gray-400 cursor-not-allowed"
-                                                : "bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 cursor-pointer"
-                                            } 
-    text-white rounded-lg transition-colors duration-300 text-sm`}
+                                        onClick={() => getSelectedStudents(job._id)}
+                                        className={`mb-3 w-full flex items-center justify-center gap-2 px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 cursor-pointer text-white rounded-lg transition-colors duration-300 text-sm`}
                                     >
                                         <i className="ri-send-plane-line text-base"></i>
-                                        Get Applied Student Details
+                                        Get Selected Student Details
+                                    </button>
+
+
+                                    <button
+                                        onClick={() => getRejectedStudents(job._id)}
+                                        className={`w-full flex items-center justify-center gap-2 px-4 py-1.5 bg-red-500 hover:bg-red-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 cursor-pointer text-white rounded-lg transition-colors duration-300 text-sm`}
+                                    >
+                                        <i className="ri-send-plane-line text-base"></i>
+                                        Get Rejected Student Details
                                     </button>
                                 </div>
                             </div>
@@ -233,4 +237,4 @@ const ReviewApplications = () => {
     );
 };
 
-export default ReviewApplications;
+export default AllocatedJobs;

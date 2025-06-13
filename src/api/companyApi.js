@@ -32,6 +32,18 @@ export const fetchAvailableJobs = async (companyId) => {
     }
 }
 
+export const fetchAllJobs = async (companyId) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/company/getAllCreatedJobs?companyId=${companyId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching available jobs:', error);
+        throw error.response ? error.response.data : error;
+    }
+}
+
+
+
 export const getAllAppliedStudents = async (jobId) => {
     try {
         const response = await axios.get(`${API_BASE_URL}/company/interestedStudents?jobId=${jobId}`);
@@ -45,6 +57,36 @@ export const getAllAppliedStudents = async (jobId) => {
 export const selectApplicants = async (jobId, selectedPRNs) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/company/selectStudents`, {jobId,selectedPRNs});
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching available jobs:', error);
+        throw error.response ? error.response.data : error;
+    }
+}
+
+export const selectedStudentDetails = async (jobId) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/company/selectedStudents?jobId=${jobId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching available jobs:', error);
+        throw error.response ? error.response.data : error;
+    }
+}
+
+export const rejectedStudentDetails = async (jobId) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/company/rejectedStudents?jobId=${jobId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching available jobs:', error);
+        throw error.response ? error.response.data : error;
+    }
+}
+
+export const allocatedJobs = async (companyId) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/company/allocatedJobs?companyId=${companyId}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching available jobs:', error);

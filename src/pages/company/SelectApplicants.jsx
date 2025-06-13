@@ -25,21 +25,7 @@ const SelectApplicants = () => {
   const handleSubmit = async () => {
     try {
       const response = await selectApplicants(jobId, selectedPRNs);
-      if (response.success) {
-        toast.success('Applicants selected successfully!', {
-          position: "top-right",
-          autoClose: 3000,
-          onClose: () => {
-            setSelectedPRNs([]);
-            navigate('/company/dashboard');
-          },
-        });
-      } else {
-        toast.error(response.message || 'Failed to select applicants.', {
-          position: "top-right",
-          autoClose: 3000,
-        });
-      }
+      console.log('Server response:', response);
     } catch (error) {
       console.error('Error submitting:', error);
       toast.error(error.message || 'Something went wrong while selecting applicants.', {
