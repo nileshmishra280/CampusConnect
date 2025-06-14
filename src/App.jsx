@@ -29,6 +29,7 @@ import AllocatedJobs from './pages/company/AllocatedJobs';
 import RejectedStudents from './pages/company/RejectedStudents';
 import CompanyProfile from './pages/company/CompanyProfile';
 import PostJob from './pages/company/PostJob';
+import Interview from './pages/company/Interview';
 
 const App = () => {
   return <AppRoutes />;
@@ -79,7 +80,8 @@ const AppRoutes = () => {
           <Route path='/company/rejectedStudents' element={<RejectedStudents />} />
           <Route path='/company/jobs/create' element={<PostJob />} />
           <Route path='/company/jobs/active' element={<ReviewApplications />} />
-
+          <Route path='/company/interviews' element={<Interview />} />
+          
           <Route path='/student/applications/jobDetails' element={<JobDetails />} />
           <Route path='/student/vewDetailsForApplication' element={<JobDetailsForApplication />} />
         </Route>
