@@ -54,6 +54,14 @@ const Interview = () => {
                 socketRef.current.emit('ice-candidate', { roomId, candidate: event.candidate });
             }
         };
+
+        peerConnection.onconnectionstatechange = () => {
+            console.log('Connection state:', peerConnection.connectionState);
+        };
+
+        peerConnection.onsignalingstatechange = () => {
+            console.log('Signaling state:', peerConnection.signalingState);
+        };
     };
 
     const processIceCandidates = async () => {
@@ -78,10 +86,7 @@ const Interview = () => {
     };
 
     useEffect(() => {
-        const isProduction = window.location.hostname !== 'localhost';
-        const socketUrl = isProduction
-            ? window.location.origin.replace('frontend', 'backend')
-            : 'http://localhost:5000';
+        const socketUrl = 'http://localhost:5000';
         socketRef.current = io(socketUrl);
 
         if (roomId) {
@@ -92,7 +97,7 @@ const Interview = () => {
             });
         }
 
-        socketRef.current.on('user-connected', async () => {
+        socketRef.current.on('ready', async () => {
             await createPeerConnection();
             const offer = await peerRef.current.createOffer();
             await peerRef.current.setLocalDescription(offer);
@@ -120,6 +125,16 @@ const Interview = () => {
                 iceQueueRef.current.push(candidate);
             }
         });
+        socketRef.current.on('you-are-caller', async () => {
+            await createPeerConnection();
+            const offer = await peerRef.current.createOffer();
+            await peerRef.current.setLocalDescription(offer);
+            socketRef.current.emit('offer', { roomId, offer });
+        });
+
+        socketRef.current.on('you-are-callee', async () => {
+            await createPeerConnection();
+        });
 
         socketRef.current.on('user-disconnected', () => {
             if (peerRef.current) {
@@ -143,7 +158,6 @@ const Interview = () => {
             <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-md mb-8">
                 <div className="flex gap-2">
                     <input
-                        id="roomInput"
                         type="text"
                         placeholder="Enter Room ID"
                         value={roomInput}
@@ -151,7 +165,6 @@ const Interview = () => {
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                     <button
-                        id="joinButton"
                         onClick={joinRoom}
                         className="bg-blue-600 text-white px-4 py-2 rounded-md transition hover:bg-blue-700 active:scale-95"
                     >
@@ -161,43 +174,16 @@ const Interview = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
-                {/* Local Video Card */}
+                {/* Local Video */}
                 <div className="bg-white shadow-md rounded-lg overflow-hidden relative">
-                    {!localStreamRef.current && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
-                            <div className="w-8 h-8 border-4 border-blue-600 border-dotted rounded-full animate-spin"></div>
-                        </div>
-                    )}
-                    <video
-                        ref={localVideoRef}
-                        autoPlay
-                        playsInline
-                        muted
-                        className="w-full h-64 object-cover rounded-t-lg"
-                    ></video>
-                    <div className="px-4 py-2 bg-gray-100 text-sm font-semibold text-gray-700 flex justify-between items-center">
-                        <span>You</span>
-                        <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" title="Connected"></div>
-                    </div>
+                    <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-64 object-cover" />
+                    <div className="px-4 py-2 bg-gray-100 text-sm font-semibold text-gray-700">You</div>
                 </div>
 
-                {/* Remote Video Card */}
+                {/* Remote Video */}
                 <div className="bg-white shadow-md rounded-lg overflow-hidden relative">
-                    {!remoteVideoRef.current?.srcObject && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
-                            <div className="w-8 h-8 border-4 border-blue-600 border-dotted rounded-full animate-spin"></div>
-                        </div>
-                    )}
-                    <video
-                        ref={remoteVideoRef}
-                        autoPlay
-                        playsInline
-                        className="w-full h-64 object-cover rounded-t-lg"
-                    ></video>
-                    <div className="px-4 py-2 bg-gray-100 text-sm font-semibold text-gray-700 flex justify-between items-center">
-                        <span>Remote</span>
-                        <div className="w-3 h-3 bg-red-400 rounded-full" title="Waiting..."></div>
-                    </div>
+                    <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-64 object-cover" />
+                    <div className="px-4 py-2 bg-gray-100 text-sm font-semibold text-gray-700">Remote</div>
                 </div>
             </div>
         </div>
