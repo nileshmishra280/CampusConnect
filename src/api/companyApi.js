@@ -93,3 +93,23 @@ export const allocatedJobs = async (companyId) => {
         throw error.response ? error.response.data : error;
     }
 }
+
+export const fetchAvailableJobsForInterview = async (companyId) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/company/getJobsForInterview?companyId=${companyId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching available jobs:', error);
+        throw error.response ? error.response.data : error;
+    }
+}
+
+export const selectApplicantsForInterview = async (jobId, prnS) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/company/scheduleInterview`, {jobId,prnS});
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching available jobs:', error);
+        throw error.response ? error.response.data : error;
+    }
+}
