@@ -113,10 +113,19 @@ const Interview = () => {
             socketRef.current.emit('answer', { roomId, answer });
         });
 
-        socketRef.current.on('answer', async ({ answer }) => {
+       socketRef.current.on('answer', async ({ answer }) => {
+    if (peerRef.current && peerRef.current.signalingState === 'have-local-offer') {
+        try {
             await peerRef.current.setRemoteDescription(new RTCSessionDescription(answer));
             await processIceCandidates();
-        });
+        } catch (err) {
+            console.error('Failed to set remote description (answer):', err);
+        }
+    } else {
+        console.warn('Skipped setting remote answer: wrong signaling state', peerRef.current?.signalingState);
+    }
+});
+
 
         socketRef.current.on('ice-candidate', async ({ candidate }) => {
             if (peerRef.current && peerRef.current.remoteDescription) {

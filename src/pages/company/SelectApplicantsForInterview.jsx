@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, Typography } from "@material-tailwind/react";
-import { selectApplicants } from '../../api/companyApi';
+import DateTimePicker from 'react-datetime-picker'; // Import the DateTimePicker
+import 'react-datetime-picker/dist/DateTimePicker.css'; // Import styles
+import { selectApplicantsForInterview } from '../../api/companyApi';
 
 const SelectApplicantsForInterview = () => {
     const location = useLocation();
@@ -9,11 +11,19 @@ const SelectApplicantsForInterview = () => {
     const jobId = location.state?.jobId;
     const navigate = useNavigate();
     const [selectedPRNs, setSelectedPRNs] = useState([]);
+    const [interviewSchedules, setInterviewSchedules] = useState({}); // State to store interview schedules
 
     const handleCheckboxChange = (prn) => {
         setSelectedPRNs((prev) =>
             prev.includes(prn) ? prev.filter((id) => id !== prn) : [...prev, prn]
         );
+    };
+
+    const handleDateTimeChange = (prn, date) => {
+        setInterviewSchedules((prev) => ({
+            ...prev,
+            [prn]: date,
+        }));
     };
 
     const handleViewMore = (student) => {
@@ -22,9 +32,18 @@ const SelectApplicantsForInterview = () => {
 
     const handleSubmit = async () => {
         try {
-            console.log("Hello there!");
-            navigate('/company/scheduleInterview', {
-                state: { selectedPRNs, jobId },
+            // Prepare the data to send to the backend
+            const selectedStudents = selectedPRNs.map((prn) => ({
+                prn,
+                scheduledAt: interviewSchedules[prn] ? interviewSchedules[prn].toISOString() : new Date().toISOString(),
+            }));
+
+            // Call the API to schedule interviews
+            await selectApplicantsForInterview(jobId, selectedStudents);
+
+            // Navigate to a confirmation page or back to the dashboard
+            navigate('/company/dashboard', {
+                state: { message: 'Interviews scheduled successfully!' },
             });
 
         } catch (error) {
@@ -38,10 +57,10 @@ const SelectApplicantsForInterview = () => {
                 {/* Header Section */}
                 <div className="mb-8 text-center">
                     <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3">
-                        Select Applicants
+                        Select Applicants for Interview
                     </h1>
                     <p className="text-gray-600 dark:text-gray-300 text-lg">
-                        Review and select the best candidates for your position
+                        Review and select the best candidates for taking Interview
                     </p>
                     <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto mt-4 rounded-full"></div>
                 </div>
@@ -75,7 +94,7 @@ const SelectApplicantsForInterview = () => {
                             <table className="w-full min-w-max table-auto text-left">
                                 <thead>
                                     <tr className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-600/20 dark:to-indigo-600/20 border-b border-blue-200/50 dark:border-blue-700/50">
-                                        {['Profile', 'Candidate Details', 'PRN', 'Actions', 'Select'].map((header, index) => (
+                                        {['Profile', 'Candidate Details', 'PRN', 'Interview Schedule', 'Actions', 'Select'].map((header, index) => (
                                             <th key={index} className="p-6 border-b border-gray-200/50 dark:border-gray-600/50">
                                                 <Typography variant="small" className="font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
                                                     {header}
@@ -116,6 +135,14 @@ const SelectApplicantsForInterview = () => {
                                                         {student.prn}
                                                     </Typography>
                                                 </div>
+                                            </td>
+                                            <td className="p-6">
+                                                <DateTimePicker
+                                                    onChange={(date) => handleDateTimeChange(student.prn, date)}
+                                                    value={interviewSchedules[student.prn] || null}
+                                                    minDate={new Date()} // Prevent past dates
+                                                    className="text-gray-800 dark:text-gray-100"
+                                                />
                                             </td>
                                             <td className="p-6">
                                                 <button
@@ -180,3 +207,4 @@ const SelectApplicantsForInterview = () => {
 };
 
 export default SelectApplicantsForInterview;
+
