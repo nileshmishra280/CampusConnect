@@ -114,3 +114,35 @@ export const selectApplicantsForInterview = async (jobId, prnS) => {
         throw error.response ? error.response.data : error;
     }
 };
+
+//API function to get jobs which are already scheduled
+export const fetchScheduledJobs = async (companyId) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/company/scheduledJobs?companyId=${companyId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching available jobs:', error);
+        throw error.response ? error.response.data : error;
+    }
+}
+
+export const getStudentsSelectedForInterview = async (jobId) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/company/studentsSelectedForInterview?jobId=${jobId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching available jobs:', error);
+        throw error.response ? error.response.data : error;
+    }
+}
+
+//API function to get jobs which were scheduled and are now over
+export const fetchPastScheduledJobs = async (companyId) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/company/pastScheduledJobs?companyId=${companyId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching available jobs:', error);
+        throw error.response ? error.response.data : error;
+    }
+}

@@ -33,6 +33,9 @@ import Interview from './pages/company/Interview';
 import JobsForScheduling from './pages/company/JobsForScheduling';
 import ScheduleInterviews from './pages/company/ScheduleInterview';
 import SelectApplicantsForInterview from './pages/company/SelectApplicantsForInterview';
+import JobForUpcomingInterview from './pages/company/interview/JobForUpcomingInterview';
+import ScheduledInformation from './pages/company/interview/ScheduledInformation';
+import JobsForPastInterviews from './pages/company/interview/JobForPastInterviews';
 
 const App = () => {
   return <AppRoutes />;
@@ -62,6 +65,8 @@ const AppRoutes = () => {
 
           <Route path="/company/applications/review" element={<ReviewApplications />} />
           <Route path="/company/applications/select" element={<SelectJob />} />
+          <Route path="/company/applications/selected" element={<AllocatedJobs />} />
+          
           <Route path="/company/applications/shortlisted" element={<AllocatedJobs />} />
 
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
@@ -88,7 +93,10 @@ const AppRoutes = () => {
           <Route path='/company/jobs/active' element={<ReviewApplications />} />
           <Route path='/company/interviews' element={<Interview />} />
           <Route path='/company/interviews/schedule' element={<JobsForScheduling />} />
-
+          <Route path='/company/interviews/upcoming' element={<JobForUpcomingInterview />} />
+          <Route path='/company/interviews/past' element={<JobsForPastInterviews />} />
+          <Route path='/company/interviews/scheduledInformation' element={<ScheduledInformation />} />
+          
           <Route path='/student/applications/jobDetails' element={<JobDetails />} />
           <Route path='/student/vewDetailsForApplication' element={<JobDetailsForApplication />} />
         </Route>

@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, Typography } from "@material-tailwind/react";
-import DateTimePicker from 'react-datetime-picker'; // Import the DateTimePicker
-import 'react-datetime-picker/dist/DateTimePicker.css'; // Import styles
+import DatePicker from 'react-datepicker';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
+
 import { selectApplicantsForInterview } from '../../api/companyApi';
 
 const SelectApplicantsForInterview = () => {
@@ -32,6 +36,7 @@ const SelectApplicantsForInterview = () => {
 
     const handleSubmit = async () => {
         try {
+            
             // Prepare the data to send to the backend
             const selectedStudents = selectedPRNs.map((prn) => ({
                 prn,
@@ -40,11 +45,15 @@ const SelectApplicantsForInterview = () => {
 
             // Call the API to schedule interviews
             await selectApplicantsForInterview(jobId, selectedStudents);
+            toast.success('Interviews scheduled successfully.', {
+                position: 'top-right',
+                autoClose: 3000,
+            });
 
             // Navigate to a confirmation page or back to the dashboard
-            navigate('/company/dashboard', {
-                state: { message: 'Interviews scheduled successfully!' },
-            });
+            setTimeout(() => {
+                navigate('/company/dashboard');
+            }, 2000);
 
         } catch (error) {
             console.error('Error submitting:', error);
@@ -137,13 +146,19 @@ const SelectApplicantsForInterview = () => {
                                                 </div>
                                             </td>
                                             <td className="p-6">
-                                                <DateTimePicker
+                                                <DatePicker
+                                                    selected={interviewSchedules[student.prn] || null}
                                                     onChange={(date) => handleDateTimeChange(student.prn, date)}
-                                                    value={interviewSchedules[student.prn] || null}
-                                                    minDate={new Date()} // Prevent past dates
-                                                    className="text-gray-800 dark:text-gray-100"
+                                                    showTimeSelect
+                                                    timeFormat="HH:mm"
+                                                    timeIntervals={15}
+                                                    dateFormat="MMMM d, yyyy h:mm aa"
+                                                    minDate={new Date()}
+                                                    className="w-full rounded-md border border-gray-300 p-2"
+                                                    wrapperClassName="w-full"
                                                 />
                                             </td>
+
                                             <td className="p-6">
                                                 <button
                                                     onClick={() => handleViewMore(student)}

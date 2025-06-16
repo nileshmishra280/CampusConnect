@@ -96,6 +96,20 @@ const ScheduleInterviews = () => {
                                             onChange={e => handleChange(prn, 'time', e.target.value)}
                                         />
                                     </td>
+
+                                    <DateTimePicker
+  onChange={(val) => {
+    const date = val?.toISOString().split('T')[0];
+    const time = val?.toTimeString().split(' ')[0].slice(0, 5); // HH:mm
+    handleChange(prn, 'date', date);
+    handleChange(prn, 'time', time);
+  }}
+  value={
+    interviewDetails[prn]?.date && interviewDetails[prn]?.time
+      ? new Date(`${interviewDetails[prn].date}T${interviewDetails[prn].time}`)
+      : null
+  }
+/>
                                 </tr>
                             ))}
                         </tbody>
