@@ -1,12 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import './Interview.css';
+import { useLocation } from 'react-router-dom';
 
 const Interview = () => {
+    const location = useLocation();
+    const roomId = location.state?.roomCode; // ✅ Always present
+
     const localVideoRef = useRef(null);
     const remoteVideoRef = useRef(null);
-    const [roomInput, setRoomInput] = useState('');
-    const [roomId, setRoomId] = useState(new URLSearchParams(window.location.search).get('room'));
     const socketRef = useRef(null);
     const peerRef = useRef(null);
     const localStreamRef = useRef(null);
@@ -54,48 +56,30 @@ const Interview = () => {
                 socketRef.current.emit('ice-candidate', { roomId, candidate: event.candidate });
             }
         };
-
-        peerConnection.onconnectionstatechange = () => {
-            console.log('Connection state:', peerConnection.connectionState);
-        };
-
-        peerConnection.onsignalingstatechange = () => {
-            console.log('Signaling state:', peerConnection.signalingState);
-        };
     };
 
     const processIceCandidates = async () => {
-        if (peerRef.current && peerRef.current.remoteDescription) {
+        if (peerRef.current?.remoteDescription) {
             for (const candidate of iceQueueRef.current) {
                 try {
                     await peerRef.current.addIceCandidate(new RTCIceCandidate(candidate));
                 } catch (err) {
-                    console.error('Error adding queued ICE candidate:', err);
+                    console.error('Error adding ICE candidate:', err);
                 }
             }
             iceQueueRef.current = [];
         }
     };
 
-    const joinRoom = () => {
-        if (!roomInput) {
-            alert('Please enter a room ID');
-            return;
-        }
-        window.location.search = `?room=${roomInput}`;
-    };
-
     useEffect(() => {
         const socketUrl = 'http://localhost:5000';
         socketRef.current = io(socketUrl);
 
-        if (roomId) {
-            startVideo().then(() => {
-                if (localStreamRef.current) {
-                    socketRef.current.emit('join-room', roomId);
-                }
-            });
-        }
+        startVideo().then(() => {
+            if (localStreamRef.current) {
+                socketRef.current.emit('join-room', roomId);
+            }
+        });
 
         socketRef.current.on('ready', async () => {
             await createPeerConnection();
@@ -113,27 +97,27 @@ const Interview = () => {
             socketRef.current.emit('answer', { roomId, answer });
         });
 
-       socketRef.current.on('answer', async ({ answer }) => {
-    if (peerRef.current && peerRef.current.signalingState === 'have-local-offer') {
-        try {
-            await peerRef.current.setRemoteDescription(new RTCSessionDescription(answer));
-            await processIceCandidates();
-        } catch (err) {
-            console.error('Failed to set remote description (answer):', err);
-        }
-    } else {
-        console.warn('Skipped setting remote answer: wrong signaling state', peerRef.current?.signalingState);
-    }
-});
-
+        socketRef.current.on('answer', async ({ answer }) => {
+            if (peerRef.current?.signalingState === 'have-local-offer') {
+                try {
+                    await peerRef.current.setRemoteDescription(new RTCSessionDescription(answer));
+                    await processIceCandidates();
+                } catch (err) {
+                    console.error('Failed to set remote description (answer):', err);
+                }
+            } else {
+                console.warn('Skipped setting remote answer: wrong signaling state', peerRef.current?.signalingState);
+            }
+        });
 
         socketRef.current.on('ice-candidate', async ({ candidate }) => {
-            if (peerRef.current && peerRef.current.remoteDescription) {
+            if (peerRef.current?.remoteDescription) {
                 await peerRef.current.addIceCandidate(new RTCIceCandidate(candidate));
             } else {
                 iceQueueRef.current.push(candidate);
             }
         });
+
         socketRef.current.on('you-are-caller', async () => {
             await createPeerConnection();
             const offer = await peerRef.current.createOffer();
@@ -156,7 +140,7 @@ const Interview = () => {
         });
 
         return () => {
-            if (socketRef.current) socketRef.current.disconnect();
+            socketRef.current?.disconnect();
         };
     }, [roomId]);
 
@@ -164,32 +148,12 @@ const Interview = () => {
         <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
             <h1 className="text-3xl font-bold text-gray-800 mb-6">WebRTC Video Chat</h1>
 
-            <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-md mb-8">
-                <div className="flex gap-2">
-                    <input
-                        type="text"
-                        placeholder="Enter Room ID"
-                        value={roomInput}
-                        onChange={(e) => setRoomInput(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <button
-                        onClick={joinRoom}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-md transition hover:bg-blue-700 active:scale-95"
-                    >
-                        Join
-                    </button>
-                </div>
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
-                {/* Local Video */}
                 <div className="bg-white shadow-md rounded-lg overflow-hidden relative">
                     <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-64 object-cover" />
                     <div className="px-4 py-2 bg-gray-100 text-sm font-semibold text-gray-700">You</div>
                 </div>
 
-                {/* Remote Video */}
                 <div className="bg-white shadow-md rounded-lg overflow-hidden relative">
                     <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-64 object-cover" />
                     <div className="px-4 py-2 bg-gray-100 text-sm font-semibold text-gray-700">Remote</div>

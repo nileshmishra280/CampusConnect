@@ -41,6 +41,7 @@ const SelectApplicantsForInterview = () => {
             const selectedStudents = selectedPRNs.map((prn) => ({
                 prn,
                 scheduledAt: interviewSchedules[prn] ? interviewSchedules[prn].toISOString() : new Date().toISOString(),
+                code: Math.floor(10000 + Math.random() * 90000),
             }));
 
             // Call the API to schedule interviews

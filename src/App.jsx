@@ -36,6 +36,7 @@ import SelectApplicantsForInterview from './pages/company/SelectApplicantsForInt
 import JobForUpcomingInterview from './pages/company/interview/JobForUpcomingInterview';
 import ScheduledInformation from './pages/company/interview/ScheduledInformation';
 import JobsForPastInterviews from './pages/company/interview/JobForPastInterviews';
+import UpcomingJobInterview from './pages/student/Interview/UpcomingJobInterview';
 
 const App = () => {
   return <AppRoutes />;
@@ -77,6 +78,7 @@ const AppRoutes = () => {
           <Route path="/student/apply-jobs/browse" element={<AvailableJobs />} />
           <Route path="/student/apply-jobs/applied" element={<AppliedJobs />} />
           <Route path="/student/applicationDetails" element={<ApplicationDetails />} />
+          <Route path="/student/interview/upcoming" element={<UpcomingJobInterview />} />
 
 
           <Route path="/jobInfo" element={<JobInfo />} />

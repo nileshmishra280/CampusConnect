@@ -49,10 +49,17 @@ const Navigation = ({ role }) => {
       },
       { name: 'Interview Questions', href: '/student/resumeQuestions', icon: 'ri-file-user-line', subItems: [] },
       { name: 'Placement Form', href: '/student/placement-form', icon: 'ri-clipboard-line', subItems: [] },
+      
       {
         name: 'Job Applications', icon: 'ri-briefcase-line', subItems: [
           { name: 'Browse Jobs', href: '/student/apply-jobs/browse' },
           { name: 'Applied Jobs', href: '/student/apply-jobs/applied' },
+        ]
+      },
+      {
+        name: 'Interview', icon: 'ri-briefcase-line', subItems: [
+          { name: 'Upcoming Interviews', href: '/student/interview/upcoming' },
+          { name: 'Past Interviews', href: '/student/interview/past' },
         ]
       },
       { name: 'Certificates', href: '/student/certificates', icon: 'ri-award-line', subItems: [] },

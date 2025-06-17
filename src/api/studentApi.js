@@ -118,3 +118,15 @@ export const fetchApplicationDetails = async (prn,jobId) => {
     throw new Error(error.response?.data?.error || 'Failed to fetch questions');
   }
 };
+
+//API function to get jobs which were scheduled and are now over
+export const fetchScheduledJobsForStudent = async (prn) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/student/scheduledJobs?prn=${prn}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching available jobs:', error);
+        throw error.response ? error.response.data : error;
+    }
+}
+
