@@ -62,15 +62,12 @@ const Navigation = ({ role }) => {
           { name: 'Past Interviews', href: '/student/interview/past' },
         ]
       },
-      { name: 'Certificates', href: '/student/certificates', icon: 'ri-award-line', subItems: [] },
-      { name: 'Internship Tracker', href: '/student/internships', icon: 'ri-global-line', subItems: [] },
-      { name: 'Study Materials', href: '/student/study-materials', icon: 'ri-book-open-line', subItems: [] },
-      { name: 'Feedback', href: '/student/feedback', icon: 'ri-chat-1-line', subItems: [] },
-    ],
+      
+      ],
     admin: [
       { name: 'Dashboard', href: '/admin/dashboard', icon: 'ri-dashboard-line', subItems: [] },
       {
-        name: 'Users', href: '/admin/users', icon: 'ri-group-line', subItems: [
+        name: 'Users', icon: 'ri-group-line', subItems: [
           { name: 'Students', href: '/admin/users/students' },
           { name: 'Companies', href: '/admin/users/companies' },
         ]
@@ -87,13 +84,7 @@ const Navigation = ({ role }) => {
           { name: 'Manage Drives', href: '/admin/placements/drives' },
           { name: 'Applications', href: '/admin/placements/applications' },
         ]
-      },
-      {
-        name: 'Settings', href: '/admin/settings', icon: 'ri-settings-3-line', subItems: [
-          { name: 'System Config', href: '/admin/settings/system' },
-          { name: 'User Roles', href: '/admin/settings/roles' },
-        ]
-      },
+      }
     ],
     company: [
       { name: 'Dashboard', href: '/company/dashboard', icon: 'ri-dashboard-line', subItems: [] },
@@ -112,7 +103,7 @@ const Navigation = ({ role }) => {
         ]
       },
       {
-        name: 'Interviews', href: '/company/interviews', icon: 'ri-user-voice-line', subItems: [
+        name: 'Interviews', icon: 'ri-user-voice-line', subItems: [
           { name: 'Schedule Interview', href: '/company/interviews/schedule' },
           { name: 'Upcoming Interviews', href: '/company/interviews/upcoming' },
           { name: 'Past Interviews', href: '/company/interviews/past' },
@@ -316,7 +307,7 @@ const Navigation = ({ role }) => {
             </nav>
 
             {/* Quick Access Toolbar */}
-            {!isCollapsed && (
+            {/* {!isCollapsed && (
               <div className="p-2 sm:p-4 border-t border-blue-500/30 flex-shrink-0">
                 <h3 className="text-xs sm:text-sm font-semibold mb-3 text-blue-100">Quick Access</h3>
                 <div className="flex gap-2">
@@ -331,7 +322,7 @@ const Navigation = ({ role }) => {
                   </button>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Resize Handle - Desktop only */}

@@ -11,3 +11,23 @@ export const addCompany = async (companyData) => {
     }
 }
 
+export const fetchAllStudents = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/admin/allStudents`);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding company:', error);
+        throw error.response ? error.response.data : error;
+    }
+}
+
+
+export const fetchAllCompanies = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/admin/allCompanies`);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding company:', error);
+        throw error.response ? error.response.data : error;
+    }
+}

@@ -37,6 +37,10 @@ import JobForUpcomingInterview from './pages/company/interview/JobForUpcomingInt
 import ScheduledInformation from './pages/company/interview/ScheduledInformation';
 import JobsForPastInterviews from './pages/company/interview/JobForPastInterviews';
 import UpcomingJobInterview from './pages/student/Interview/UpcomingJobInterview';
+import PastJobInterview from './pages/student/Interview/PastJobInterview';
+import PastScheduledInformation from './pages/company/interview/PastScheduledInformation';
+import Students from './pages/admin/Students';
+import Companies from './pages/admin/Companies';
 
 const App = () => {
   return <AppRoutes />;
@@ -79,7 +83,7 @@ const AppRoutes = () => {
           <Route path="/student/apply-jobs/applied" element={<AppliedJobs />} />
           <Route path="/student/applicationDetails" element={<ApplicationDetails />} />
           <Route path="/student/interview/upcoming" element={<UpcomingJobInterview />} />
-
+          <Route path="/student/interview/past" element={<PastJobInterview />} />
 
           <Route path="/jobInfo" element={<JobInfo />} />
           <Route path="/company/profile" element={<CompanyProfile />} />
@@ -98,9 +102,16 @@ const AppRoutes = () => {
           <Route path='/company/interviews/upcoming' element={<JobForUpcomingInterview />} />
           <Route path='/company/interviews/past' element={<JobsForPastInterviews />} />
           <Route path='/company/interviews/scheduledInformation' element={<ScheduledInformation />} />
+          <Route path='/company/interviews/pastScheduledInformation' element={<PastScheduledInformation />} />
           
           <Route path='/student/applications/jobDetails' element={<JobDetails />} />
           <Route path='/student/vewDetailsForApplication' element={<JobDetailsForApplication />} />
+        
+
+
+          <Route path='/admin/users/students' element={<Students />} />
+          <Route path='/admin/users/companies' element={<Companies />} />
+        
         </Route>
       </Routes>
     </Router>

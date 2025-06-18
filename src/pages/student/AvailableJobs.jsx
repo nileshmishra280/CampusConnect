@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { fetchAvailableJobs } from '../../api/studentApi';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { IoEyeOutline } from 'react-icons/io5';
 
 const AvailableJobs = () => {
     const { user } = useAuth();
@@ -324,7 +325,7 @@ const AvailableJobs = () => {
                                         onClick={() => handleViewDetails(job)}
                                         className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm bg-gradient-to-r from-green-700 to-green-400 hover:from-green-600 hover:to-green-900 text-white shadow-md hover:shadow-lg transition-all duration-300 group"
                                     >
-                                        <SendIcon />
+                                        <IoEyeOutline />
                                         View more details
                                     </button>
                                 </div>

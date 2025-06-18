@@ -119,10 +119,21 @@ export const fetchApplicationDetails = async (prn,jobId) => {
   }
 };
 
-//API function to get jobs which were scheduled and are now over
+//API function to get jobs which were scheduled and are now upcoming
 export const fetchScheduledJobsForStudent = async (prn) => {
     try {
         const response = await axios.get(`${API_BASE_URL}/student/scheduledJobs?prn=${prn}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching available jobs:', error);
+        throw error.response ? error.response.data : error;
+    }
+}
+
+//API function to get jobs which were scheduled and are now over
+export const fetchPastScheduledJobs = async (prn) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/student/pastScheduledJobs?prn=${prn}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching available jobs:', error);

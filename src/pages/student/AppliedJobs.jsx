@@ -3,6 +3,8 @@ import { useAuth } from '../../context/AuthContext';
 import { fetchApplicationDetails, fetchAvailableJobs, retrieveApplication } from '../../api/studentApi';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { IoEyeOutline } from 'react-icons/io5';
+import { HiOutlineArrowCircleLeft } from 'react-icons/hi';
 
 const AppliedJobs = () => {
     const { user, setUser } = useAuth();
@@ -326,12 +328,10 @@ const AppliedJobs = () => {
                                         </div>
                                         <button
                                             onClick={() => handleViewApplication(job._id)}
-                                            className={`w-full my-3 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-md hover:shadow-lg'
-                                            `}
+                                            className="w-full my-3 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white shadow-md hover:shadow-lg"
+
                                         >
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
-                                            </svg>
+                                            <IoEyeOutline className="w-4 h-4" />
                                             View application details
                                         </button>
                                         <button
@@ -343,10 +343,8 @@ const AppliedJobs = () => {
                                             }`}
                                             disabled={isApplicationExpired(job.lastDateForApplication)}
                                         >
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
-                                            </svg>
-                                            Retrieve
+                                            <HiOutlineArrowCircleLeft className="w-4 h-4"/>
+                                            Withdraw
                                         </button>
                                     </div>
                                 </div>

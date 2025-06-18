@@ -89,7 +89,7 @@ const JobsForPastInterviews = () => {
         console.log(jobId);
         const res=await getStudentsSelectedForInterview(jobId);
         console.log(res);
-        navigate('/company/interviews/scheduledInformation', { state: { res ,jobId} });
+        navigate('/company/interviews/pastScheduledInformation', { state: { res ,jobId} });
     };
 
     return (
