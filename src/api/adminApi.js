@@ -31,3 +31,13 @@ export const fetchAllCompanies = async () => {
         throw error.response ? error.response.data : error;
     }
 }
+
+export const fetchPlacementAnalytics = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/admin/analytics`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching placement analytics:', error);
+        throw error.response ? error.response.data : error;
+    }
+};

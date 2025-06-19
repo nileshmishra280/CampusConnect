@@ -41,6 +41,7 @@ import PastJobInterview from './pages/student/Interview/PastJobInterview';
 import PastScheduledInformation from './pages/company/interview/PastScheduledInformation';
 import Students from './pages/admin/Students';
 import Companies from './pages/admin/Companies';
+import PlacementAnalytics from './pages/admin/PlacementAnalytics';
 
 const App = () => {
   return <AppRoutes />;
@@ -111,6 +112,7 @@ const AppRoutes = () => {
 
           <Route path='/admin/users/students' element={<Students />} />
           <Route path='/admin/users/companies' element={<Companies />} />
+          <Route path='/admin/analytics' element={<PlacementAnalytics/>} />
         
         </Route>
       </Routes>
