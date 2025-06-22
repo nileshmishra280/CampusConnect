@@ -16,7 +16,7 @@ const Companies = () => {
     }, [])
     const filteredCompanies = companies.filter(company =>
         company._id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        company.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        company.companyName?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -65,7 +65,7 @@ const Companies = () => {
                                         <img
                                             src={company.companyProfile || '/default-avatar.png'}
                                             alt={company.name}
-                                            className="w-12 h-12 rounded-full object-cover border-2 border-indigo-400 group-hover:scale-110 transition-transform duration-300 shadow"
+                                            className="w-12 h-12 rounded-full object-cover border-2  group-hover:scale-110 transition-transform duration-300 shadow"
                                         />
                                     </td>
                                     <td className="p-5 font-mono font-semibold text-700 dark:text-indigo-300">

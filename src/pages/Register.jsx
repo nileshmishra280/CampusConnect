@@ -10,8 +10,11 @@ const RegisterPage = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
+  const [dept, setDept] = useState('');
+  const [passOutYear, setPassOutYear] = useState('');
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -100,7 +103,7 @@ const RegisterPage = () => {
     <>
       <ToastContainer />
       <div className={`min-h-screen flex items-center justify-center font-poppins transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800' : 'bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500'}`}>
-        <div className={`w-full max-w-sm rounded-lg p-6 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${isDarkMode ? 'bg-gray-800 text-white border border-gray-700' : 'bg-white text-gray-800 border border-purple-100'}`}>
+        <div className={`w-full max-w-xl md:max-w-2xl lg:max-w-3xl rounded-lg p-6 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${isDarkMode ? 'bg-gray-800 text-white border border-gray-700' : 'bg-white text-gray-800 border border-purple-100'}`}>
           {/* Header with Dark Mode Toggle */}
           <div className="flex items-center justify-between mb-4">
             <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-purple-300' : 'text-purple-600'}`}>
@@ -118,136 +121,178 @@ const RegisterPage = () => {
           {/* Registration or Verification Form */}
           {!verificationSent ? (
             <form onSubmit={handleRegister}>
-              <div className="mb-3">
-                <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  <i className="ri-id-card-line"></i> PRN
-                </label>
-                <div className="relative">
-                  <span className={`absolute top-1/2 left-2 -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    <i className="ri-id-card-line"></i>
-                  </span>
-                  <input
-                    type="text"
-                    value={prn}
-                    onChange={(e) => setPrn(e.target.value)}
-                    placeholder="Enter your PRN"
-                    className={`w-full p-2 pl-8 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                    required
-                  />
-                </div>
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+                <div className="mb-3">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-profile-line"></i> PRN
+                  </label>
+                  <div className="relative">
 
-              <div className="mb-3">
-                <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  <i className="ri-user-line"></i> Name
-                </label>
-                <div className="relative">
-                  <span className={`absolute top-1/2 left-2 -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    <i className="ri-user-line"></i>
-                  </span>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter your name"
-                    className={`w-full p-2 pl-8 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                    required
-                  />
+                    <input
+                      type="text"
+                      value={prn}
+                      onChange={(e) => setPrn(e.target.value)}
+                      placeholder="Enter your PRN"
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="mb-3">
-                <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  <i className="ri-mail-line"></i> Email
-                </label>
-                <div className="relative">
-                  <span className={`absolute top-1/2 left-2 -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    <i className="ri-mail-line"></i>
-                  </span>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className={`w-full p-2 pl-8 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                    required
-                  />
+                <div className="mb-3">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-building-line"></i> Department
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={dept}
+                      onChange={(e) => setDept(e.target.value)}
+                      className={`w-full p-2 pl-3 rounded-md text-sm appearance-none transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                      required
+                    >
+                      <option value="" disabled>Select your department</option>
+                      <option value="CSE">Computer Science & Engineering</option>
+                      <option value="IT">Information Technology</option>
+                      <option value="ECE">Electronics & Communication Engineering</option>
+                      <option value="EEE">Electrical & Electronics Engineering</option>
+                      <option value="MECH">Mechanical Engineering</option>
+                      <option value="CIVIL">Civil Engineering</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
 
-              <div className="mb-3">
-                <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  <i className="ri-lock-line"></i> Password
-                </label>
-                <div className="relative">
-                  <span className={`absolute top-1/2 left-2 -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    <i className="ri-lock-line"></i>
-                  </span>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className={`w-full p-2 pl-8 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                    required
-                  />
+                <div className="mb-3">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-user-line"></i> Name
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter your name"
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="mb-3">
-                <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  <i className="ri-phone-line"></i> Phone
-                </label>
-                <div className="relative">
-                  <span className={`absolute top-1/2 left-2 -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    <i className="ri-phone-line"></i>
-                  </span>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="Enter your phone"
-                    className={`w-full p-2 pl-8 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                    required
-                  />
+                <div className="mb-3">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-mail-line"></i> Email
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="mb-3">
-                <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  <i className="ri-home-line"></i> Address
-                </label>
-                <div className="relative">
-                  <span className={`absolute top-1/2 left-2 -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    <i className="ri-home-line"></i>
-                  </span>
-                  <input
-                    type="text"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Enter your address (optional)"
-                    className={`w-full p-2 pl-8 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                  />
+                <div className="mb-3">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-lock-line"></i> Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="mb-4">
-                <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  <i className="ri-image-line"></i> Profile Photo
-                </label>
-                <div className="relative">
-                  <span className={`absolute top-1/2 left-2 -translate-y-1/2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    <i className="ri-image-line"></i>
-                  </span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setProfilePhoto(e.target.files[0])}
-                    className={`w-full p-2 pl-8 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                  />
+                <div className="mb-3">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-lock-line"></i>Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Enter your confirm password"
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
 
+                <div className="mb-3">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-phone-line"></i> Phone
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="Enter your phone"
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-home-line"></i> Address
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder="Enter your address (optional)"
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-image-line"></i> Profile Photo
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setProfilePhoto(e.target.files[0])}
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-calendar-line"></i> Pass Out Year
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={passOutYear}
+                      onChange={(e) => setPassOutYear(e.target.value)}
+                      className={`w-full p-2 pl-3 rounded-md text-sm appearance-none transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                      required
+                    >
+                      <option value="" disabled>Select your pass out year</option>
+                      {
+                        Array.from({ length: 8 }).map((_, i) => {
+                          const year = new Date().getFullYear() - i + 3;
+                          return <option key={year} value={year}>{year}</option>;
+                        })
+                      }
+                    </select>
+                  </div>
+                </div>
+
+              </div>
               <button
                 type="submit"
                 disabled={isLoading}
@@ -282,7 +327,7 @@ const RegisterPage = () => {
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value)}
                     placeholder="Enter verification code"
-                    className={`w-full p-2 pl-8 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                    className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
                     required
                   />
                 </div>

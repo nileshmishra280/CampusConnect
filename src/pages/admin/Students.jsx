@@ -17,7 +17,7 @@ const Students = () => {
     const filteredStudents = students.filter(student =>
         student.prn?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         student.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.yearOfPassout?.toString().includes(searchTerm)
+        student.passOutYear?.toString().includes(searchTerm)
     );
 
     const handleViewMore = (student) => {
@@ -70,14 +70,14 @@ const Students = () => {
                                         <img
                                             src={student.profilePhoto || '/default-avatar.png'}
                                             alt={student.name}
-                                            className="w-12 h-12 rounded-full object-cover border-2 border-indigo-400 group-hover:scale-110 transition-transform duration-300 shadow"
+                                            className="w-12 h-12 rounded-full object-cover border-2 group-hover:scale-110 transition-transform duration-300 shadow"
                                         />
                                     </td>
                                     <td className="p-5 font-mono font-semibold text-indigo-700 dark:text-indigo-300">
                                         {student.prn}
                                     </td>
                                     <td className="p-5 text-gray-700 dark:text-gray-300">
-                                        {student.yearOfPassout}
+                                        {student.passOutYear}
                                     </td>
                                     <td className="p-5 text-gray-700 dark:text-gray-300">
                                         {student.additionalData.department ? student.additionalData.department : null}

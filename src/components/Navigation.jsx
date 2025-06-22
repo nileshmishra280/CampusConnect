@@ -4,8 +4,8 @@ import { useAuth } from '../context/AuthContext';
 
 
 const Navigation = ({ role }) => {
-  const { user,logout } = useAuth();
-  const navigate=useNavigate();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default closed on mobile
   const [sidebarWidth, setSidebarWidth] = useState(256);
   const [isResizing, setIsResizing] = useState(false);
@@ -13,12 +13,8 @@ const Navigation = ({ role }) => {
     // Initialize darkMode from localStorage, default to false (light mode) if not set
     return localStorage.getItem('theme') === 'dark';
   });
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: 'New placement drive scheduled!', time: '2h ago', unread: true },
-    { id: 2, message: 'Application deadline approaching.', time: '1d ago', unread: false },
-  ]);
+
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedItems, setExpandedItems] = useState({});
   const [isMobile, setIsMobile] = useState(false);
@@ -33,7 +29,7 @@ const Navigation = ({ role }) => {
     role = 'student';
   }
 
-  const handleLogOut=()=>{
+  const handleLogOut = () => {
     logout();
     navigate('/');
   }
@@ -44,12 +40,12 @@ const Navigation = ({ role }) => {
       { name: 'Dashboard', href: '/student/dashboard', icon: 'ri-dashboard-line', subItems: [] },
       {
         name: 'Applications', href: '/student/applications', icon: 'ri-file-text-line', subItems: [
-          
+
         ]
       },
       { name: 'Interview Questions', href: '/student/resumeQuestions', icon: 'ri-file-user-line', subItems: [] },
       { name: 'Placement Form', href: '/student/placement-form', icon: 'ri-clipboard-line', subItems: [] },
-      
+
       {
         name: 'Job Applications', icon: 'ri-briefcase-line', subItems: [
           { name: 'Browse Jobs', href: '/student/apply-jobs/browse' },
@@ -62,8 +58,8 @@ const Navigation = ({ role }) => {
           { name: 'Past Interviews', href: '/student/interview/past' },
         ]
       },
-      
-      ],
+
+    ],
     admin: [
       { name: 'Dashboard', href: '/admin/dashboard', icon: 'ri-dashboard-line', subItems: [] },
       {
@@ -74,9 +70,7 @@ const Navigation = ({ role }) => {
       },
       {
         name: 'Analytics', href: '/admin/analytics', icon: 'ri-line-chart-line', subItems: [
-          { name: 'Placement Stats', href: '/admin/analytics/placements' },
-          { name: 'User Activity', href: '/admin/analytics/activity' },
-          { name: 'Reports', href: '/admin/analytics/reports' },
+
         ]
       },
       {
@@ -143,7 +137,6 @@ const Navigation = ({ role }) => {
     const handleClickOutside = (event) => {
       if (!event.target.closest('.dropdown-container')) {
         setIsProfileOpen(false);
-        setIsNotificationsOpen(false);
       }
     };
 
@@ -184,10 +177,6 @@ const Navigation = ({ role }) => {
     item.subItems.some(sub => sub.name.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const breadcrumbs = location.pathname.split('/').filter(Boolean).map((part, index, arr) => {
-    const path = `/${arr.slice(0, index + 1).join('/')}`;
-    return { name: part.charAt(0).toUpperCase() + part.slice(1), href: path };
-  });
 
   const isCollapsed = !isSidebarOpen && !isMobile;
 
@@ -336,7 +325,7 @@ const Navigation = ({ role }) => {
 
         {/* Mobile Toggle */}
 
-          {/* dark:bg-gray-900/90 backdrop-blur-md shadow-lg border-b border-gray-200/50 dark:border-gray-700/50 */}
+        {/* dark:bg-gray-900/90 backdrop-blur-md shadow-lg border-b border-gray-200/50 dark:border-gray-700/50 */}
 
 
         <button
@@ -370,27 +359,13 @@ const Navigation = ({ role }) => {
               <div className="flex items-center gap-4 min-w-0 flex-1">
                 <div className="min-w-0 flex-1">
                   <h1 className="text-lg sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 truncate pl-6">
-                    {role.charAt(0).toUpperCase() + role.slice(1)} Dashboard
+                    {role.charAt(0).toUpperCase() + role.slice(1)}
                   </h1>
                   {/* To center instead, replace pl-4 with text-center */}
                   {/* <h1 className="text-lg sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 truncate text-center"> */}
-                  <div className="hidden ml-6 sm:flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mt-1.5">
-                    {breadcrumbs.map((crumb, index) => (
-                      <div key={crumb.href} className="flex items-center">
-                        <Link
-                          to={crumb.href}
-                          className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 truncate font-medium"
-                        >
-                          {crumb.name}
-                        </Link>
-                        {index < breadcrumbs.length - 1 && (
-                          <i className="ri-arrow-right-s-line mx-1.5 text-gray-400 dark:text-gray-500 flex-shrink-0"></i>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                  
                 </div>
-                <div className="relative hidden md:block">
+                <div className="relative hidden md:block pr-3">
                   <i className="ri-search-line absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                   <input
                     type="text"
@@ -403,44 +378,7 @@ const Navigation = ({ role }) => {
               </div>
 
               <div className="flex items-center gap-1 sm:gap-2 lg:gap-3">
-                <div className="relative dropdown-container">
-                  <button
-                    onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                    className="relative p-2 sm:p-2.5 lg:p-3 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                    aria-label="Notifications"
-                    aria-expanded={isNotificationsOpen}
-                  >
-                    <i className="ri-notification-3-line text-lg sm:text-xl text-gray-600 dark:text-gray-300"></i>
-                    {notifications.filter((n) => n.unread).length > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 h-4 w-4 sm:h-5 sm:w-5 bg-gradient-to-br from-red-500 to-pink-500 text-white text-xs rounded-full flex items-center justify-center font-medium shadow-sm animate-pulse">
-                        {notifications.filter((n) => n.unread).length}
-                      </span>
-                    )}
-                  </button>
-                  {isNotificationsOpen && (
-                    <div className="absolute right-0 mt-3 w-72 sm:w-80 bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden animate-slideDown">
-                      <div className="p-3 sm:p-4 border-b border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200">Notifications</h3>
-                          <button className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200">
-                            <i className="ri-settings-3-line"></i>
-                          </button>
-                        </div>
-                      </div>
-                      <div className="max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
-                        {notifications.map((notification) => (
-                          <div
-                            key={notification.id}
-                            className={`p-3 sm:p-4 border-b border-gray-100/50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200 ${notification.unread ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''}`}
-                          >
-                            <p className="text-sm text-gray-800 dark:text-gray-200 mb-1 font-medium">{notification.message}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{notification.time}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+
 
                 <button
                   onClick={() => setDarkMode(!darkMode)}
@@ -473,7 +411,7 @@ const Navigation = ({ role }) => {
                           ? user.company?.companyProfile || 'https://via.placeholder.com/150'
                           : role === 'student'
                             ? user.student?.profilePhoto || 'https://via.placeholder.com/150'
-                            : user.profilePhoto?user.profilePhoto: 'https://via.placeholder.com/150'
+                            : user.profilePhoto ? user.profilePhoto : 'https://via.placeholder.com/150'
                       }
                       alt="User avatar"
                       className="h-8 w-8 sm:h-9 sm:w-9 rounded-full border-2 border-white dark:border-gray-700 shadow-md hover:scale-105 transition-transform duration-200"
@@ -482,17 +420,24 @@ const Navigation = ({ role }) => {
                   </button>
                   {isProfileOpen && (
                     <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden animate-slideDown">
-                      <Link
-                        to={
-                          role==='company'? "/company/profile" : role==='student'? "/student/profile" : "/admin/profile"
-                        }
-                        className="flex items-center gap-3 px-4 py-3 text-gray-800 dark:text-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-colors duration-200"
-                      >
-                        <i className="ri-user-line text-lg"></i>
-                        <span className="font-medium">Profile</span>
-                      </Link>
+                      {
+                        (role == 'company' || role == 'student') && (
+                          <>
+                            <Link
+                              to={
+                                role === 'company' ? "/company/profile" : "/student/profile"
+                              }
+                              className="flex items-center gap-3 px-4 py-3 text-gray-800 dark:text-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-colors duration-200"
+                            >
+                              <i className="ri-user-line text-lg"></i>
+                              <span className="font-medium">Profile</span>
+                            </Link>
 
-                      <hr className="border-gray-200/50 dark:border-gray-700/50" />
+                            <hr className="border-gray-200/50 dark:border-gray-700/50" />
+                          </>
+                        )
+
+                      }
                       <button className="flex items-center gap-3 w-full text-left px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/20 transition-colors duration-200" onClick={handleLogOut}>
                         <i className="ri-logout-box-line text-lg"></i>
                         <span className="font-medium">Logout</span>
