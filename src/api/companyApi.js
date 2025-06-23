@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API_BASE_URL = 'http://localhost:5000'; // Adjust for production
+const API_BASE_URL = import.meta.env.VITE_API_URL; // Adjust for production
 
 export const postJob = async (jobData) => {
     try {

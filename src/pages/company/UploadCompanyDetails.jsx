@@ -4,7 +4,7 @@ import axios from 'axios';
 
 
 const UploadCompanyDetails = () => {
-    const API_BASE_URL = "http://localhost:5000"
+    const API_BASE_URL = import.meta.env.VITE_APP_URL;
     const { user } = useAuth();
     const [images, setImages] = useState({
         profilePhoto: null

@@ -19,6 +19,7 @@ const SelectApplicants = () => {
   };
 
   const handleViewMore = (student) => {
+    console.log(student);
     navigate('/company/applicantDetails', { state: { student } });
   };
 
@@ -74,8 +75,9 @@ const SelectApplicants = () => {
 
         {/* Main Table Card */}
         <Card className="shadow-2xl rounded-2xl overflow-hidden bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border border-white/20 dark:border-gray-700/30 transition-all duration-300">
-          <div className="p-8">
-            <div className="overflow-x-auto">
+          <div className="p-6 sm:p-8">
+            {/* Table View - only on large screens */}
+            <div className="hidden lg:block overflow-x-auto">
               <table className="w-full min-w-max table-auto text-left">
                 <thead>
                   <tr className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-600/20 dark:to-indigo-600/20 border-b border-blue-200/50 dark:border-blue-700/50">
@@ -95,24 +97,17 @@ const SelectApplicants = () => {
                       className="group hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-900/20 dark:hover:to-indigo-900/20 transition-all duration-300 border-b border-gray-100/50 dark:border-gray-700/30"
                     >
                       <td className="p-6">
-                        <div className="relative">
-                          <img
-                            src={student.profilePhoto}
-                            alt={student.name}
-                            className="w-16 h-16 rounded-full object-cover border-3 border-white dark:border-gray-600 shadow-lg group-hover:scale-110 transition-transform duration-300"
-                          />
-                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
-                        </div>
+                        <img
+                          src={student.profilePhoto}
+                          alt={student.name}
+                          className="w-16 h-16 rounded-full object-cover border-3 border-white dark:border-gray-600 shadow-lg transition-transform group-hover:scale-110 duration-300"
+                        />
                       </td>
                       <td className="p-6">
-                        <div>
-                          <Typography variant="small" className="font-bold text-gray-800 dark:text-gray-100 text-lg">
-                            {student.name}
-                          </Typography>
-                          <Typography variant="small" className="text-gray-500 dark:text-gray-400 mt-1">
-                            Candidate Profile
-                          </Typography>
-                        </div>
+                        <Typography variant="small" className="font-bold text-gray-800 dark:text-gray-100 text-lg">
+                          {student.name}
+                        </Typography>
+                        <Typography variant="small" className="text-gray-500 dark:text-gray-400 mt-1">Candidate Profile</Typography>
                       </td>
                       <td className="p-6">
                         <div className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-600/20 dark:to-indigo-600/20 px-3 py-2 rounded-full inline-block">
@@ -126,14 +121,11 @@ const SelectApplicants = () => {
                           onClick={() => handleViewMore(student)}
                           className="group relative inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg hover:shadow-xl transform hover:scale-105"
                         >
-                          <span className="relative flex items-center">
-                            <svg className="w-4 h-4 mr-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                            View Details
-                          </span>
-                          <div className="absolute inset-0 rounded-full bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          View Details
                         </button>
                       </td>
                       <td className="p-6">
@@ -149,13 +141,64 @@ const SelectApplicants = () => {
                           </div>
                         </label>
                       </td>
+
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+
+            {/* Cards View - only on small/medium screens */}
+            <div className="block lg:hidden space-y-4">
+              {students.map((student, index) => (
+                <div key={index} className="bg-white dark:bg-gray-900/50 rounded-xl p-5 shadow-md border border-gray-200 dark:border-gray-700 space-y-3">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={student.profilePhoto}
+                      alt={student.name}
+                      className="w-16 h-16 rounded-full object-cover border-2 border-white dark:border-gray-600 shadow"
+                    />
+                    <div>
+                      <p className="font-bold text-gray-800 dark:text-gray-100 text-lg">{student.name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Candidate Profile</p>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 pr-3">PRN:</span>
+                    <div className="mt-1 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-600/20 dark:to-indigo-600/20 px-3 py-1 rounded-full inline-block">
+                      <span className="font-mono font-semibold text-blue-700 dark:text-blue-300">{student.prn}</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <button
+                      onClick={() => handleViewMore(student)}
+                      className="w-full sm:w-auto group relative inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg hover:shadow-xl transform hover:scale-105"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      View Details
+                    </button>
+                    <label className="relative inline-flex items-center cursor-pointer group">
+                      <span className="text-sm text-gray-500 dark:text-gray-400 pr-3">Select </span>
+                      <input
+                        type="checkbox"
+                        checked={selectedPRNs.includes(student.prn)}
+                        onChange={() => handleCheckboxChange(student.prn)}
+                        className="sr-only peer"
+                      />
+                      <div className="relative w-14 h-7 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-blue-500 peer-checked:to-indigo-600 shadow-inner group-hover:shadow-lg transition-all duration-300">
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400/20 to-indigo-400/20 scale-0 peer-checked:scale-100 transition-transform duration-300"></div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </Card>
+
 
         {/* Submit Button */}
         <div className="flex justify-center mt-10">

@@ -11,12 +11,12 @@ const Applicants = () => {
 
     return (
         <div>
-            <section class="bg-white py-12">
-                <div class="max-w-6xl mx-auto px-4">
-                    <div class="text-center mb-12">
-                        <h2 class="text-3xl font-bold text-gray-800">Applied students:</h2>
+            <section className="bg-white py-12">
+                <div className="max-w-6xl mx-auto px-4">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl font-bold text-gray-800">Applied students:</h2>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                         {students.map((student, index) => (
                             <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 shadow hover:shadow-lg transition">
                                 <div className="flex items-center space-x-4">
