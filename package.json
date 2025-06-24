@@ -7,8 +7,7 @@
     "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "start": "node server.js"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@glidejs/glide": "^3.7.1",
