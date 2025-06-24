@@ -5,8 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  server: {
-    host: true,
-    allowedHosts: ['campusconnect-71g3.onrender.com'],
-  },
+  base: '/',
+  // server: {
+  //   host: true,
+  //   allowedHosts: ['https://campusconnect-tnp.onrender.com/'],
+  // },
 });
