@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../../public/css/remixicon.css'; // Import Remix Icon CSS
+//import '../../public/css/remixicon.css'; // Import Remix Icon CSS
 import { StudentRegister, VerifyEmail } from '../api/authApi';
 
 const RegisterPage = () => {
