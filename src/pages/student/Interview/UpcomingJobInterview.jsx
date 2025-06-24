@@ -67,113 +67,195 @@ const UpcomingJobInterview = () => {
 
                 {
                     jobs.length !== 0 && (
-                        <Card className="shadow-2xl rounded-2xl overflow-hidden bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border border-white/20 dark:border-gray-700/30 transition-all duration-300">
-                            <div className="p-4 sm:p-8">
-                                <div className="w-full overflow-x-auto">
-                                    <table className="w-full table-fixed text-left text-sm sm:text-base break-words">
-                                        <thead>
-                                            <tr className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-600/20 dark:to-indigo-600/20 border-b border-blue-200/50 dark:border-blue-700/50">
-                                                {['Job', 'Schedule', 'Actions', 'Join Interview'].map((header, index) => (
-                                                    <th
-                                                        key={index}
-                                                        className="p-4 sm:p-6 break-words border-b border-gray-200/50 dark:border-gray-600/50 w-[25%]"
-                                                    >
-                                                        <Typography className="font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider text-xs sm:text-sm">
-                                                            {header}
-                                                        </Typography>
-                                                    </th>
-                                                ))}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {jobs.map((job, index) => {
-                                                const now = new Date();
-                                                const scheduledAt = new Date(job.scheduledAt);
-                                                const oneDayAfter = new Date(scheduledAt);
-                                                oneDayAfter.setDate(oneDayAfter.getDate() + 1);
-                                                const isDisabled = now < scheduledAt || now > oneDayAfter;
+                        <>
+                            <div className="hidden lg:block">
 
-                                                return (
-                                                    <tr
-                                                        key={index}
-                                                        className="group hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-900/20 dark:hover:to-indigo-900/20 transition-all duration-300 border-b border-gray-100/50 dark:border-gray-700/30"
-                                                    >
-                                                        <td className="p-4 sm:p-6 break-words w-[25%]">
-                                                            <Typography className="font-semibold text-gray-800 dark:text-gray-100 text-sm sm:text-base break-words">
-                                                                {job.jobDetails.jobTitle}
-                                                            </Typography>
-                                                        </td>
-                                                        <td className="p-4 sm:p-6 break-words w-[25%]">
-                                                            <Typography className="font-semibold text-gray-800 dark:text-gray-100 text-sm sm:text-base break-words">
-                                                                {new Date(job.scheduledAt).toLocaleString('en-GB', {
-                                                                    hour: '2-digit',
-                                                                    minute: '2-digit',
-                                                                    day: '2-digit',
-                                                                    month: '2-digit',
-                                                                    year: 'numeric',
-                                                                }).replace(',', '')}
-                                                            </Typography>
-                                                        </td>
-                                                        <td className="p-4 sm:p-6 break-words w-[25%]">
-                                                            <button
-                                                                onClick={() => handleViewMore(job)}
-                                                                className="w-full sm:w-auto group relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg hover:shadow-xl transform hover:scale-105"
+                                <Card className="shadow-2xl rounded-2xl overflow-hidden bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border border-white/20 dark:border-gray-700/30 transition-all duration-300">
+                                    <div className="p-4 sm:p-8">
+                                        <div className="w-full overflow-x-auto">
+                                            <table className="w-full table-fixed text-left text-sm sm:text-base break-words">
+                                                <thead>
+                                                    <tr className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-600/20 dark:to-indigo-600/20 border-b border-blue-200/50 dark:border-blue-700/50">
+                                                        {['Job', 'Schedule', 'Actions', 'Join Interview'].map((header, index) => (
+                                                            <th
+                                                                key={index}
+                                                                className="p-4 sm:p-6 break-words border-b border-gray-200/50 dark:border-gray-600/50 w-[25%]"
                                                             >
-                                                                <span className="relative flex items-center">
-                                                                    <svg
-                                                                        className="w-4 h-4 mr-2 transition-transform group-hover:translate-x-1"
-                                                                        fill="none"
-                                                                        stroke="currentColor"
-                                                                        viewBox="0 0 24 24"
-                                                                    >
-                                                                        <path
-                                                                            strokeLinecap="round"
-                                                                            strokeLinejoin="round"
-                                                                            strokeWidth="2"
-                                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                        />
-                                                                        <path
-                                                                            strokeLinecap="round"
-                                                                            strokeLinejoin="round"
-                                                                            strokeWidth="2"
-                                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                        />
-                                                                    </svg>
-                                                                    View Details
-                                                                </span>
-                                                                <div className="absolute inset-0 rounded-full bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
-                                                            </button>
-                                                        </td>
-                                                        <td className="p-4 sm:p-6 break-words w-[25%]">
-                                                            <button
-                                                                onClick={() => joinInterview(job)}
-                                                                disabled={isDisabled}
-                                                                className={`w-full sm:w-auto group relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm font-medium text-white transition-all duration-300 rounded-full shadow-lg transform ${isDisabled
-                                                                    ? 'bg-gray-400 cursor-not-allowed'
-                                                                    : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800'
-                                                                    }`}
-                                                            >
-                                                                <span className="relative flex items-center">
-                                                                    <svg
-                                                                        className="w-4 h-4 mr-2 transition-transform group-hover:translate-x-1"
-                                                                        fill="currentColor"
-                                                                        viewBox="0 0 20 20"
-                                                                    >
-                                                                        <path d="M6.5 5.5v9l7-4.5-7-4.5z" />
-                                                                    </svg>
-                                                                    Join
-                                                                </span>
-                                                                <div className="absolute inset-0 rounded-full bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
-                                                            </button>
-                                                        </td>
+                                                                <Typography className="font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider text-xs sm:text-sm">
+                                                                    {header}
+                                                                </Typography>
+                                                            </th>
+                                                        ))}
                                                     </tr>
-                                                );
-                                            })}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                </thead>
+                                                <tbody>
+                                                    {jobs.map((job, index) => {
+                                                        const now = new Date();
+                                                        const scheduledAt = new Date(job.scheduledAt);
+                                                        const oneDayAfter = new Date(scheduledAt);
+                                                        oneDayAfter.setDate(oneDayAfter.getDate() + 1);
+                                                        const isDisabled = now < scheduledAt || now > oneDayAfter;
+
+                                                        return (
+                                                            <tr
+                                                                key={index}
+                                                                className="group hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-900/20 dark:hover:to-indigo-900/20 transition-all duration-300 border-b border-gray-100/50 dark:border-gray-700/30"
+                                                            >
+                                                                <td className="p-4 sm:p-6 break-words w-[25%]">
+                                                                    <Typography className="font-semibold text-gray-800 dark:text-gray-100 text-sm sm:text-base break-words">
+                                                                        {job.jobDetails.jobTitle}
+                                                                    </Typography>
+                                                                </td>
+                                                                <td className="p-4 sm:p-6 break-words w-[25%]">
+                                                                    <Typography className="font-semibold text-gray-800 dark:text-gray-100 text-sm sm:text-base break-words">
+                                                                        {new Date(job.scheduledAt).toLocaleString('en-GB', {
+                                                                            hour: '2-digit',
+                                                                            minute: '2-digit',
+                                                                            day: '2-digit',
+                                                                            month: '2-digit',
+                                                                            year: 'numeric',
+                                                                        }).replace(',', '')}
+                                                                    </Typography>
+                                                                </td>
+                                                                <td className="p-4 sm:p-6 break-words w-[25%]">
+                                                                    <button
+                                                                        onClick={() => handleViewMore(job)}
+                                                                        className="w-full sm:w-auto group relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg hover:shadow-xl transform hover:scale-105"
+                                                                    >
+                                                                        <span className="relative flex items-center">
+                                                                            <svg
+                                                                                className="w-4 h-4 mr-2 transition-transform group-hover:translate-x-1"
+                                                                                fill="none"
+                                                                                stroke="currentColor"
+                                                                                viewBox="0 0 24 24"
+                                                                            >
+                                                                                <path
+                                                                                    strokeLinecap="round"
+                                                                                    strokeLinejoin="round"
+                                                                                    strokeWidth="2"
+                                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                                                                />
+                                                                                <path
+                                                                                    strokeLinecap="round"
+                                                                                    strokeLinejoin="round"
+                                                                                    strokeWidth="2"
+                                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                                                                />
+                                                                            </svg>
+                                                                            View Details
+                                                                        </span>
+                                                                        <div className="absolute inset-0 rounded-full bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                                                                    </button>
+                                                                </td>
+                                                                <td className="p-4 sm:p-6 break-words w-[25%]">
+                                                                    <button
+                                                                        onClick={() => joinInterview(job)}
+                                                                        disabled={isDisabled}
+                                                                        className={`w-full sm:w-auto group relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm font-medium text-white transition-all duration-300 rounded-full shadow-lg transform ${isDisabled
+                                                                            ? 'bg-gray-400 cursor-not-allowed'
+                                                                            : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800'
+                                                                            }`}
+                                                                    >
+                                                                        <span className="relative flex items-center">
+                                                                            <svg
+                                                                                className="w-4 h-4 mr-2 transition-transform group-hover:translate-x-1"
+                                                                                fill="currentColor"
+                                                                                viewBox="0 0 20 20"
+                                                                            >
+                                                                                <path d="M6.5 5.5v9l7-4.5-7-4.5z" />
+                                                                            </svg>
+                                                                            Join
+                                                                        </span>
+                                                                        <div className="absolute inset-0 rounded-full bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </Card>
                             </div>
-                        </Card>
+
+
+                            <div className="block lg:hidden space-y-6">
+                                {jobs.map((job, index) => {
+                                    const now = new Date();
+                                    const scheduledAt = new Date(job.scheduledAt);
+                                    const oneDayAfter = new Date(scheduledAt);
+                                    oneDayAfter.setDate(oneDayAfter.getDate() + 1);
+                                    const isDisabled = now < scheduledAt || now > oneDayAfter;
+
+                                    return (
+                                        <Card
+                                            key={index}
+                                            className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border border-white/20 dark:border-gray-700/30 shadow-lg rounded-2xl transition-all duration-300"
+                                        >
+                                            {/* Job Title */}
+                                            <div className="mb-4">
+                                                <span className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Job</span>
+                                                <Typography className="font-semibold text-gray-800 dark:text-gray-100 text-sm break-words">
+                                                    {job.jobDetails.jobTitle}
+                                                </Typography>
+                                            </div>
+
+                                            {/* Schedule */}
+                                            <div className="mb-4">
+                                                <span className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Schedule</span>
+                                                <Typography className="font-semibold text-gray-800 dark:text-gray-100 text-sm break-words">
+                                                    {new Date(job.scheduledAt).toLocaleString('en-GB', {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                        day: '2-digit',
+                                                        month: '2-digit',
+                                                        year: 'numeric',
+                                                    }).replace(',', '')}
+                                                </Typography>
+                                            </div>
+
+                                            {/* Actions */}
+                                            <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                                                {/* View Details */}
+                                                <button
+                                                    onClick={() => handleViewMore(job)}
+                                                    className="w-full sm:w-auto group relative inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg hover:shadow-xl transform hover:scale-105"
+                                                >
+                                                    <span className="relative flex items-center">
+                                                        <svg className="w-4 h-4 mr-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                        View Details
+                                                    </span>
+                                                    <div className="absolute inset-0 rounded-full bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                                                </button>
+
+                                                {/* Join Interview */}
+                                                <button
+                                                    onClick={() => joinInterview(job)}
+                                                    disabled={isDisabled}
+                                                    className={`w-full sm:w-auto group relative inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-all duration-300 rounded-full shadow-lg transform ${isDisabled
+                                                        ? 'bg-gray-400 cursor-not-allowed'
+                                                        : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800'
+                                                        }`}
+                                                >
+                                                    <span className="relative flex items-center">
+                                                        <svg className="w-4 h-4 mr-2 transition-transform group-hover:translate-x-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path d="M6.5 5.5v9l7-4.5-7-4.5z" />
+                                                        </svg>
+                                                        Join
+                                                    </span>
+                                                    <div className="absolute inset-0 rounded-full bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                                                </button>
+                                            </div>
+                                        </Card>
+                                    );
+                                })}
+                            </div>
+                        </>
+
                     )
                 }
 

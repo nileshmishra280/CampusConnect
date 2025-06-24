@@ -21,7 +21,6 @@ const JobsForScheduling = () => {
             await new Promise((resolve) => setTimeout(resolve, 1000));
             try {
                 const response = await fetchAvailableJobsForInterview(user.company.companyId);
-                console.log('Fetched jobs:', response); // Debugging line
 
                 if (Array.isArray(response)) {
                     setJobs(response);
@@ -87,7 +86,6 @@ const JobsForScheduling = () => {
 
     const getStudents = async (jobId) => {
         const res=await getAllAppliedStudents(jobId);
-        console.log(res);
         navigate('/company/selectApplicantsForInterview', { state: { res ,jobId} });
     };
 

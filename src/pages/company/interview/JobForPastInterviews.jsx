@@ -21,7 +21,6 @@ const JobsForPastInterviews = () => {
             await new Promise((resolve) => setTimeout(resolve, 1000));
             try {
                 const response = await fetchPastScheduledJobs(user.company.companyId);
-                console.log('Fetched jobs:', response); // Debugging line
 
                 if (Array.isArray(response)) {
                     setJobs(response);
@@ -86,9 +85,7 @@ const JobsForPastInterviews = () => {
     };
 
     const getStudents = async (jobId) => {
-        console.log(jobId);
         const res=await getStudentsSelectedForInterview(jobId);
-        console.log(res);
         navigate('/company/interviews/pastScheduledInformation', { state: { res ,jobId} });
     };
 

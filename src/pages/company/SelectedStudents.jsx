@@ -14,7 +14,6 @@ const SelectedStudents = () => {
             try {
                 const details = await selectedStudentDetails(jobId);
                 setStudents(details);
-                console.log(details);
             } catch (error) {
                 console.error('Error fetching selected students:', error);
             }
@@ -24,7 +23,6 @@ const SelectedStudents = () => {
     }, [])
 
     const handleViewMore = (student) => {
-        console.log(student);
         navigate('/company/applicantDetails', { state: { student } });
     };
 

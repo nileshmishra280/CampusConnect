@@ -42,7 +42,6 @@ const ScheduleInterviews = () => {
 
         try {
             const res = await selectApplicantsForInterview(jobId, prnS);
-            console.log(res);
         } catch (error) {
             console.error('Error scheduling interview:', error);
         }

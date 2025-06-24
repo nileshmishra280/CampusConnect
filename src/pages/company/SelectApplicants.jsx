@@ -19,14 +19,12 @@ const SelectApplicants = () => {
   };
 
   const handleViewMore = (student) => {
-    console.log(student);
     navigate('/company/applicantDetails', { state: { student } });
   };
 
   const handleSubmit = async () => {
     try {
       const response = await selectApplicants(jobId, selectedPRNs);
-      console.log('Server response:', response);
     } catch (error) {
       console.error('Error submitting:', error);
       toast.error(error.message || 'Something went wrong while selecting applicants.', {
