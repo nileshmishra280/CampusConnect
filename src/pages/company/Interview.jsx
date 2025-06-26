@@ -253,9 +253,11 @@ const Interview = () => {
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                        
+
                         {messages.map((msg, index) => {
                             const isSelf = msg.from === socketId;
-                            return ( isSelf && 
+                            return (
                                 <div
                                     key={index}
                                     className={`p-3 rounded-lg shadow max-w-xs break-words ${isSelf ? 'bg-purple-500 text-white ml-auto' : 'bg-white text-gray-800 mr-auto'
