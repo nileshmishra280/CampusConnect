@@ -220,7 +220,24 @@ const Interview = () => {
                             placeholder="Type a message"
                             className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                         />
-                        <input type="file" accept="image/*" onChange={handleImageChange} className="text-sm" />
+
+                        {/* Custom file input */}
+                        <div>
+                            <label
+                                htmlFor="file-upload"
+                                className="inline-block px-4 py-2 cursor-pointer text-sm bg-gray-100 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-200 transition"
+                            >
+                                📎 Attach Image
+                            </label>
+                            <input
+                                id="file-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="hidden"
+                            />
+                        </div>
+
                         <button
                             type="submit"
                             className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition"
@@ -228,6 +245,7 @@ const Interview = () => {
                             Send
                         </button>
                     </form>
+
                 </div>
             </div>
 
@@ -253,7 +271,7 @@ const Interview = () => {
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                        
+
 
                         {messages.map((msg, index) => {
                             const isSelf = msg.from === socketId;
@@ -284,7 +302,24 @@ const Interview = () => {
                             placeholder="Type a message"
                             className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                         />
-                        <input type="file" accept="image/*" onChange={handleImageChange} className="text-sm" />
+
+                        {/* Custom styled file input */}
+                        <div>
+                            <label
+                                htmlFor="imageUpload"
+                                className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md border border-gray-300 hover:bg-gray-200 transition text-sm"
+                            >
+                                📎 Choose Image
+                            </label>
+                            <input
+                                id="imageUpload"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="hidden"
+                            />
+                        </div>
+
                         <button
                             type="submit"
                             className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition"
@@ -292,6 +327,7 @@ const Interview = () => {
                             Send
                         </button>
                     </form>
+
                 </div>
             )}
         </div>
