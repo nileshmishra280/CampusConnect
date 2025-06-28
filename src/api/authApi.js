@@ -11,7 +11,7 @@ export const StudentLogin = async (prn, password) => {
   }
 };
 
-export const StudentRegister = async (studentData) => {
+export const StudentRegister = async (studentData,addStudentData) => {
   try {
     console.log('Registering student with data:');
     const response = await axios.post(`${API_BASE_URL}/student/signUp`, studentData);

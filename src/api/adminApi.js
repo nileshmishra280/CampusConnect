@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API_BASE_URL = import.meta.env.VITE_API_URL; 
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const addCompany = async (companyData) => {
     try {
@@ -35,6 +35,28 @@ export const fetchAllCompanies = async () => {
 export const fetchPlacementAnalytics = async () => {
     try {
         const response = await axios.get(`${API_BASE_URL}/admin/analytics`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching placement analytics:', error);
+        throw error.response ? error.response.data : error;
+    }
+};
+
+
+export const fetchPendingVerifications = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/admin/pendingVerifications`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching placement analytics:', error);
+        throw error.response ? error.response.data : error;
+    }
+};
+
+
+export const verifyPRN = async (prn) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/admin/verifyPRN`, prn);
         return response.data;
     } catch (error) {
         console.error('Error fetching placement analytics:', error);

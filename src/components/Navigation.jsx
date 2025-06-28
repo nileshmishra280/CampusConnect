@@ -74,6 +74,11 @@ const Navigation = ({ role }) => {
         ]
       },
       {
+        name: 'Verify Forms', href: '/admin/pendingVerifications', icon: 'ri-file-check-line', subItems: [
+
+        ]
+      },
+      {
         name: 'Placements', href: '/admin/placements', icon: 'ri-building-line', subItems: [
           { name: 'Manage Drives', href: '/admin/placements/drives' },
           { name: 'Applications', href: '/admin/placements/applications' },

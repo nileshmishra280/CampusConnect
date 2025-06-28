@@ -4,6 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 //import '../../public/css/remixicon.css'; // Import Remix Icon CSS
 import { StudentRegister, VerifyEmail } from '../api/authApi';
+import { fetchPercentage, uploadConfirmedMarks } from '../api/studentApi';
 
 const RegisterPage = () => {
   const [prn, setPrn] = useState('');
@@ -21,6 +22,17 @@ const RegisterPage = () => {
   const [verificationSent, setVerificationSent] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const navigate = useNavigate();
+  const [images, setImages] = useState({
+    std10: null,
+    std12OrDiploma: null,
+    college: null,
+    resume: null,
+  });
+  const [marks, setMarks] = useState({
+    tenth: '',
+    twelfth: '',
+    cgpa: '',
+  });
 
   // Check system preference for dark mode on mount
   useEffect(() => {
@@ -29,6 +41,16 @@ const RegisterPage = () => {
     document.documentElement.classList.toggle('dark', prefersDark);
   }, []);
 
+  const handleFileChange = async (e) => {
+    const { name, files } = e.target;
+    if (files.length !== 1) {
+      toast.error(`Please select exactly one file for ${name}.`, { position: 'top-right' });
+      return;
+    }
+
+    setImages((prev) => ({ ...prev, [name]: files[0] }));
+  };
+
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
     document.documentElement.classList.toggle('dark');
@@ -36,10 +58,11 @@ const RegisterPage = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (!prn || !name || !email || !password || !phone) {
+    if (!prn || !name || !email || !password || !phone || !images.std10 || !images.std12OrDiploma || !images.college || !dept) {
       toast.error('Please fill all required fields!', { position: 'top-right' });
       return;
     }
+
 
     setIsLoading(true);
     try {
@@ -50,16 +73,53 @@ const RegisterPage = () => {
       formData.append('email', email);
       formData.append('password', password);
       formData.append('phone', phone);
+      formData.append('department', dept);
       if (address) formData.append('address', address);
       if (profilePhoto) formData.append('profilePhoto', profilePhoto);
+
+
+      const formDataAdd = new FormData();
+      formDataAdd.append('images', images.std10);
+      formDataAdd.append('images', images.std12OrDiploma);
+      formDataAdd.append('images', images.college);
+      if (images.resume) {
+        formDataAdd.append('resume', images.resume);
+      }
+      formDataAdd.append('prn', prn);
+      formDataAdd.append('department', dept);
 
       // Log form data for debugging
       for (const [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`);
       }
 
+      try {
+        const res = await fetchPercentage(formDataAdd);
+
+        if (!res.success) {
+          toast.error('Failed to fetch marks, upload clear images', { position: 'top-right' });
+          return;
+        }
+
+        setMarks({
+          tenth: res.data.std10_percentage ? res.data.std10_percentage.replace('%', '') : '',
+          twelfth: res.data.std12_or_diploma ? res.data.std12_or_diploma.replace('%', '') : '',
+          cgpa: res.data.college_cgpa || '',
+        });
+      } catch (err) {
+        setError(err.message || 'Network error');
+      }
+
+
       // Call the registration API
       const response = await StudentRegister(formData);
+
+      formDataAdd.append('std10_percentage', parseFloat(marks.tenth) || 0);
+      formDataAdd.append('std12_percentage', marks.twelfth && !response?.data?.std12_or_diploma.includes('.') ? parseFloat(marks.twelfth) || 0 : null);
+      formDataAdd.append('diploma_cgpa', marks.twelfth && response?.data?.std12_or_diploma.includes('.') ? parseFloat(marks.twelfth) || 0 : null);
+      formDataAdd.append('college_cgpa', marks.cgpa || '');
+      formDataAdd.append('email',email);
+      const response2 = await uploadConfirmedMarks(formDataAdd);
       if (!response.success) {
         toast.error(response.error || 'Registration failed. Please try again!', { position: 'top-right' });
         setIsLoading(false);
@@ -103,7 +163,7 @@ const RegisterPage = () => {
     <>
       <ToastContainer />
       <div className={`min-h-screen flex items-center justify-center font-poppins transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800' : 'bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500'}`}>
-        <div className={`w-full max-w-xl md:max-w-2xl lg:max-w-3xl rounded-lg p-6 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${isDarkMode ? 'bg-gray-800 text-white border border-gray-700' : 'bg-white text-gray-800 border border-purple-100'}`}>
+        <div className={`w-full max-w-xl md:max-w-4xl lg:max-w-6xl rounded-lg p-6 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${isDarkMode ? 'bg-gray-800 text-white border border-gray-700' : 'bg-white text-gray-800 border border-purple-100'}`}>
           {/* Header with Dark Mode Toggle */}
           <div className="flex items-center justify-between mb-4">
             <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-purple-300' : 'text-purple-600'}`}>
@@ -121,7 +181,125 @@ const RegisterPage = () => {
           {/* Registration or Verification Form */}
           {!verificationSent ? (
             <form onSubmit={handleRegister}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
+
+                <h2 className={`col-span-full text-lg md:text-xl font-semibold mt-6 mb-3 flex items-center gap-2 ${isDarkMode ? 'text-purple-200' : 'text-purple-700'}`}>
+                  <i className="ri-information-line"></i> Personal Information
+                </h2>
+
+                <div className="mb-3">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-user-line"></i> Name
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter your name"
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-mail-line"></i> Email
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-phone-line"></i> Phone
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="Enter your phone"
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-3 col-span-full">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-home-line"></i> Address
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder="Enter your address (optional)"
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-lock-line"></i> Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-lock-line"></i>Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Enter your confirm password"
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <i className="ri-image-line"></i> Profile Photo
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setProfilePhoto(e.target.files[0])}
+                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
+                    />
+                  </div>
+                </div>
+
+                <h2 className={`col-span-full text-lg md:text-xl font-semibold mt-6 mb-3 flex items-center gap-2 ${isDarkMode ? 'text-purple-200' : 'text-purple-700'}`}>
+                  <i className="ri-information-line"></i> Educational Information
+                </h2>
+
                 <div className="mb-3">
                   <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     <i className="ri-profile-line"></i> PRN
@@ -161,114 +339,17 @@ const RegisterPage = () => {
                   </div>
                 </div>
 
-                <div className="mb-3">
-                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    <i className="ri-user-line"></i> Name
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter your name"
-                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                      required
-                    />
-                  </div>
-                </div>
 
-                <div className="mb-3">
-                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    <i className="ri-mail-line"></i> Email
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email"
-                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                      required
-                    />
-                  </div>
-                </div>
 
-                <div className="mb-3">
-                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    <i className="ri-lock-line"></i> Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter your password"
-                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                      required
-                    />
-                  </div>
-                </div>
 
-                <div className="mb-3">
-                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    <i className="ri-lock-line"></i>Confirm Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Enter your confirm password"
-                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                      required
-                    />
-                  </div>
-                </div>
 
-                <div className="mb-3">
-                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    <i className="ri-phone-line"></i> Phone
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="Enter your phone"
-                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                      required
-                    />
-                  </div>
-                </div>
 
-                <div className="mb-3">
-                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    <i className="ri-home-line"></i> Address
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      placeholder="Enter your address (optional)"
-                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                    />
-                  </div>
-                </div>
 
-                <div className="mb-4">
-                  <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    <i className="ri-image-line"></i> Profile Photo
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => setProfilePhoto(e.target.files[0])}
-                      className={`w-full p-2 pl-3 rounded-md text-sm transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-800 focus:border-purple-400'}`}
-                    />
-                  </div>
-                </div>
+
+
+
+
+
 
                 <div className="mb-4">
                   <label className={`flex items-center gap-1 mb-1 font-medium text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -291,6 +372,36 @@ const RegisterPage = () => {
                     </select>
                   </div>
                 </div>
+
+                {['std10', 'std12OrDiploma', 'college', 'resume'].map((field) => (
+                  <div key={field} className='mb-4'>
+                    <label
+                      htmlFor={field}
+                      className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      {field === 'std10'
+                        ? 'Class 10th Marksheet'
+                        : field === 'std12OrDiploma'
+                          ? 'Class 12th or Diploma Marksheet'
+                          : field === 'college'
+                            ? 'College Marksheet'
+                            : 'Resume (PDF)'}
+                    </label>
+                    <input
+                      type="file"
+                      id={field}
+                      name={field}
+                      accept={field === 'resume' ? 'application/pdf' : 'image/*'}
+                      onChange={handleFileChange}
+                      className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300 dark:hover:file:bg-blue-800 transition-all"
+                    />
+                    {images[field] && (
+                      <p className="mt-2 text-sm text-green-600 dark:text-green-400">
+                        {images[field].name}
+                      </p>
+                    )}
+                  </div>
+                ))}
 
               </div>
               <button

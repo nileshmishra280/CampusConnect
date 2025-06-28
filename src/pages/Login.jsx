@@ -64,6 +64,14 @@ const LoginPage = () => {
         throw new Error('Invalid role detected.');
       }
 
+      if(role==='student'){
+        console.log(userData);
+        if(!userData.student.hasVerified){
+          toast.error("Your verification is pending from admin side!", { position: 'top-right' });
+          return;
+        }
+      }
+
       // Update AuthContext state with the full user data
       setUserType(role);
       setUser(userData);

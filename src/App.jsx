@@ -42,6 +42,8 @@ import PastScheduledInformation from './pages/company/interview/PastScheduledInf
 import Students from './pages/admin/Students';
 import Companies from './pages/admin/Companies';
 import PlacementAnalytics from './pages/admin/PlacementAnalytics';
+import PendingVerifications from './pages/admin/PendingVerifications';
+import VerifyDetails from './pages/admin/VerifyDetails';
 
 const App = () => {
   return <AppRoutes />;
@@ -113,6 +115,8 @@ const AppRoutes = () => {
           <Route path='/admin/users/students' element={<Students />} />
           <Route path='/admin/users/companies' element={<Companies />} />
           <Route path='/admin/analytics' element={<PlacementAnalytics/>} />
+          <Route path='/admin/pendingVerifications' element={<PendingVerifications/>} />
+          <Route path='/admin/verfiyStudentDetails' element={<VerifyDetails/>} />
         
         </Route>
       </Routes>
