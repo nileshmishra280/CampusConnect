@@ -55,11 +55,12 @@ export const fetchPendingVerifications = async () => {
 
 
 export const verifyPRN = async (prn) => {
+    console.log("Verifying PRN:", prn);
     try {
-        const response = await axios.post(`${API_BASE_URL}/admin/verifyPRN`, prn);
+        const response = await axios.post(`${API_BASE_URL}/admin/verifyPRN`, { prn });
         return response.data;
     } catch (error) {
-        console.error('Error fetching placement analytics:', error);
+        console.error('Error verifying PRN:', error);
         throw error.response ? error.response.data : error;
     }
 };

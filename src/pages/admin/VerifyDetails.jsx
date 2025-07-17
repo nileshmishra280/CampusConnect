@@ -1,17 +1,33 @@
-import React from 'react'
+import React from 'react';
 import { MdEmail } from 'react-icons/md';
-import { useLocation } from 'react-router-dom'
+import { FaLinkedin } from 'react-icons/fa';
+import { useLocation } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // Required for toast styling
 import { verifyPRN } from '../../api/adminApi';
 
 const VerifyDetails = () => {
     const location = useLocation();
     const student = location.state?.student;
 
-    const handleVerify=async (prn)=>{
-        await verifyPRN(prn);
-        toast.success("Student veriufied successfully",{position:'top-right'});
+    if (!student) {
+        return <div className="text-center text-gray-600 dark:text-gray-300">No student data available</div>;
     }
+
+    const handleVerify = async (prn) => {
+        console.log("Verifying PRN:", prn);
+        try {
+            const result = await verifyPRN(prn);
+            if (result.success) {
+                toast.success("Student verified successfully", { position: 'top-right' });
+            } else {
+                toast.error("Verification failed", { position: 'top-right' });
+            }
+        } catch (error) {
+            toast.error(error.message || "Error verifying student", { position: 'top-right' });
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-900 dark:to-indigo-950 p-4 sm:p-6 md:p-8 transition-all duration-500">
             <div className="max-w-7xl mx-auto">
@@ -106,8 +122,7 @@ const VerifyDetails = () => {
                                 <div className="space-y-4">
                                     <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 p-4 rounded-xl border border-orange-200/30 dark:border-orange-700/30">
                                         <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Email Address</label>
-                                        <p className="text-lg font-semibold text-gray-800 dark:text-gray-100">{student.email}</ p>
-
+                                        <p className="text-lg font-semibold text-gray-800 dark:text-gray-100">{student.email}</p>
                                     </div>
                                     <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-4 rounded-xl border border-purple-200/30 dark:border-purple-700/30">
                                         <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Address</label>
@@ -133,7 +148,7 @@ const VerifyDetails = () => {
                                 {/* Department */}
                                 <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 p-6 rounded-2xl border border-indigo-200/30 dark:border-indigo-700/30">
                                     <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 block">Department</label>
-                                    <p className="text-xl font-bold text-indigo-700 dark:text-indigo-300">{student.data?.department}</p>
+                                    <p className="text-xl font-bold text-indigo-700 dark:text-indigo-300">{student.data?.department || 'N/A'}</p>
                                 </div>
 
                                 {/* Academic Records Grid */}
@@ -147,22 +162,24 @@ const VerifyDetails = () => {
                                                 </svg>
                                             </div>
                                             <h4 className="font-bold text-gray-700 dark:text-gray-200">College CGPA</h4>
-                                            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-3">{student.data?.education?.college?.cmks}</p>
+                                            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-3">{student.data?.education?.college?.cmks || 'N/A'}</p>
                                         </div>
-                                        <a
-                                            href={student.data?.education?.college?.cimage}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="group relative inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-                                        >
-                                            <span className="relative flex items-center">
-                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                </svg>
-                                                View Result
-                                            </span>
-                                            <div className="absolute inset-0 rounded-xl bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
-                                        </a>
+                                        {student.data?.education?.college?.cimage && (
+                                            <a
+                                                href={student.data.education.college.cimage}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="group relative inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                                            >
+                                                <span className="relative flex items-center">
+elves                                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                    View Result
+                                                </span>
+                                                <div className="absolute inset-0 rounded-xl bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                                            </a>
+                                        )}
                                     </div>
 
                                     {/* 12th Marks */}
@@ -174,22 +191,24 @@ const VerifyDetails = () => {
                                                 </svg>
                                             </div>
                                             <h4 className="font-bold text-gray-700 dark:text-gray-200">12th Grade</h4>
-                                            <p className="text-2xl font-bold text-green-600 dark:text-green-400 mb-3">{student.data?.education?.std12_or_diploma?.mks12}%</p>
+                                            <p className="text-2xl font-bold text-green-600 dark:text-green-400 mb-3">{student.data?.education?.std12_or_diploma?.mks12 ? `${student.data.education.std12_or_diploma.mks12}%` : 'N/A'}</p>
                                         </div>
-                                        <a
-                                            href={student.data?.education?.std12_or_diploma?.image12}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="group relative inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-green-500 to-green-600 rounded-xl hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-                                        >
-                                            <span className="relative flex items-center">
-                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                </svg>
-                                                View Result
-                                            </span>
-                                            <div className="absolute inset-0 rounded-xl bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
-                                        </a>
+                                        {student.data?.education?.std12_or_diploma?.image12 && (
+                                            <a
+                                                href={student.data.education.std12_or_diploma.image12}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="group relative inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-green-500 to-green-600 rounded-xl hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                                            >
+                                                <span className="relative flex items-center">
+                                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                    View Result
+                                                </span>
+                                                <div className="absolute inset-0 rounded-xl bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                                            </a>
+                                        )}
                                     </div>
 
                                     {/* 10th Marks */}
@@ -201,22 +220,24 @@ const VerifyDetails = () => {
                                                 </svg>
                                             </div>
                                             <h4 className="font-bold text-gray-700 dark:text-gray-200">10th Grade</h4>
-                                            <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-3">{student.data?.education?.std10?.mks10}%</p>
+                                            <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-3">{student.data?.education?.std10?.mks10 ? `${student.data.education.std10.mks10}%` : 'N/A'}</p>
                                         </div>
-                                        <a
-                                            href={student.data?.education?.std10?.image10}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="group relative inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl hover:from-orange-600 hover:to-orange-700 focus:outline-none focus:ring-4 focus:ring-orange-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-                                        >
-                                            <span className="relative flex items-center">
-                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                </svg>
-                                                View Result
-                                            </span>
-                                            <div className="absolute inset-0 rounded-xl bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
-                                        </a>
+                                        {student.data?.education?.std10?.image10 && (
+                                            <a
+                                                href={student.data.education.std10.image10}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="group relative inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl hover:from-orange-600 hover:to-orange-700 focus:outline-none focus:ring-4 focus:ring-orange-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                                            >
+                                                <span className="relative flex items-center">
+                                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                    View Result
+                                                </span>
+                                                <div className="absolute inset-0 rounded-xl bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                                            </a>
+                                        )}
                                     </div>
 
                                     {/* Resume */}
@@ -230,27 +251,26 @@ const VerifyDetails = () => {
                                             <h4 className="font-bold text-gray-700 dark:text-gray-200">Resume</h4>
                                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">View full resume details</p>
                                         </div>
-                                        <a
-                                            href={student.data?.resume}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="group relative inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl hover:from-purple-600 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-                                        >
-                                            <span className="relative flex items-center">
-                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-                                                </svg>
-                                                View Resume
-                                            </span>
-                                            <div className="absolute inset-0 rounded-xl bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
-                                        </a>
+                                        {student.data?.resume && (
+                                            <a
+                                                href={student.data.resume}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="group relative inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl hover:from-purple-600 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                                            >
+                                                <span className="relative flex items-center">
+                                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                                                    </svg>
+                                                    View Resume
+                                                </span>
+                                                <div className="absolute inset-0 rounded-xl bg-white/20 scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                                            </a>
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-
-
                     </div>
                 </div>
                 <div className="flex justify-center pt-8">
@@ -263,8 +283,9 @@ const VerifyDetails = () => {
                     </button>
                 </div>
             </div>
+            <ToastContainer />
         </div>
     );
-}
+};
 
-export default VerifyDetails
+export default VerifyDetails;
