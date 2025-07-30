@@ -10,7 +10,7 @@
 [![Nodemailer](https://img.shields.io/badge/Nodemailer-Email%20Service-0F9D58?style=flat-square&logo=gmail&logoColor=white)](https://nodemailer.com/)
 [![Cloudinary](https://img.shields.io/badge/Cloudinary-Media%20Storage-3448C5?style=flat-square&logo=cloudinary&logoColor=white)](https://cloudinary.com/)
 
-### 📺 [**WATCH DEMO VIDEO**](https://youtu.be/b24N5f9mS8s?si=oqSPKeocTK0R3hFg) | 💻 [**VIEW CODE**](your-github-repo-link) | 🚀 [**TRY LIVE DEMO**](your-liv) |
+### 📺 [**WATCH DEMO VIDEO**](https://youtu.be/b24N5f9mS8s?si=oqSPKeocTK0R3hFg) | 💻 [**VIEW CODE**](your-github-repo-link) | 🚀 [**TRY LIVE DEMO**](https://campusconnect-tnp.onrender.com) |
 
 *Streamlining campus recruitment with cutting-edge technology*
 
